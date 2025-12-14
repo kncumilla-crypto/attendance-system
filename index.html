@@ -863,27 +863,71 @@
         }
 
         function setupServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registered:', registration);
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            console.log('Service Worker update found');
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showNotification('New version available! Refresh to update.', 'info');
-                                }
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
-                    });
+    if ('serviceWorker' in navigator) {
+        // GitHub Pages এর জন্য সঠিক path নির্ধারণ
+        const basePath = window.location.pathname.includes('attendance-system') 
+            ? '/attendance-system/' 
+            : '/';
+        const swUrl = basePath + 'service-worker.js';
+        
+        console.log('Registering Service Worker from:', swUrl);
+        
+        navigator.serviceWorker.register(swUrl, { 
+            scope: basePath  // সঠিক scope সেট করুন
+        })
+        .then(registration => {
+            console.log('✅ Service Worker registered successfully. Scope:', registration.scope);
+            
+            // Force update
+            registration.update();
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('🔄 New Service Worker found. State:', newWorker.state);
+                
+                newWorker.addEventListener('statechange', () => {
+                    console.log('📊 Service Worker state changed to:', newWorker.state);
+                    
+                    if (newWorker.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            console.log('🆕 New content available!');
+                            showNotification('নতুন আপডেট উপলব্ধ! রিফ্রেশ করুন।', 'info');
+                        } else {
+                            console.log('📱 Content is cached for offline use.');
+                        }
+                    }
+                    
+                    if (newWorker.state === 'activated') {
+                        console.log('🎯 Service Worker activated! Ready for offline use.');
+                        // Optional: Tell all tabs to reload
+                        if (registration.active) {
+                            registration.active.postMessage({ action: 'UPDATE_AVAILABLE' });
+                        }
+                    }
+                });
+            });
+            
+            // Check for controller
+            if (navigator.serviceWorker.controller) {
+                console.log('🎮 This page is controlled by Service Worker');
             }
-        }
-
+        })
+        .catch(error => {
+            console.error('❌ Service Worker registration failed:', error);
+            
+            // Show user-friendly error
+            if (error.message.includes('MIME type')) {
+                console.warn('⚠️ Check if service-worker.js file exists on server');
+            }
+            
+            // Fallback: App will work without Service Worker
+            console.log('📝 Running without Service Worker features');
+        });
+    } else {
+        console.log('ℹ️ Service Worker not supported in this browser');
+    }
+}
         function setupPWAInstall() {
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
@@ -2336,4 +2380,5 @@ University of Chittagong
         }
     </script>
 </body>
+
 </html>
