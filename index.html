@@ -24,392 +24,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
-    <style>
-        /* ==================== BASE STYLES ==================== */
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            min-height: 100vh;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        /* ==================== NETWORK INDICATOR ==================== */
-        .network-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-        }
-        
-        .online-indicator, .offline-indicator {
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: none;
-        }
-        
-        .online-indicator {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .offline-indicator {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        /* ==================== LOGIN SCREEN ==================== */
-        .login-container {
-            max-width: 400px;
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin: 0 auto;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #2c3e50, #4a6491);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .login-form {
-            padding: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        /* ==================== BUTTONS ==================== */
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .btn-success {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        .btn-warning {
-            background-color: #f39c12;
-            color: white;
-        }
-        
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-info {
-            background-color: #17a2b8;
-            color: white;
-        }
-        
-        /* ==================== DASHBOARD ==================== */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .courses-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .course-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            border-left: 5px solid #3498db;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        /* ==================== ATTENDANCE PAGE ==================== */
-        .attendance-start-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-            text-align: center;
-            min-height: 400px;
-        }
-        
-        .attendance-start-btn {
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            padding: 25px 40px;
-            font-size: 1.4rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 350px;
-            transition: all 0.3s;
-            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
-        }
-        
-        /* ==================== ATTENDANCE POPUP ==================== */
-        .attendance-popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        
-        .attendance-popup-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .attendance-option-btn {
-            padding: 18px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        
-        .present-btn {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        .present-btn:hover {
-            background-color: #229954;
-        }
-        
-        .absent-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .absent-btn:hover {
-            background-color: #c0392b;
-        }
-        
-        /* ==================== SEARCH & CORRECTION ==================== */
-        .correction-section {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-            display: none;
-        }
-        
-        .correction-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        /* ==================== DATA MANAGEMENT ==================== */
-        .data-management {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .backup-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        
-        /* ==================== QUICK CORRECTION ==================== */
-        .quick-correction {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(44, 62, 80, 0.95);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            display: none;
-            align-items: center;
-            gap: 15px;
-            z-index: 2500;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        /* ==================== PWA INSTALL PROMPT ==================== */
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            padding: 20px;
-            z-index: 3000;
-            display: none;
-        }
-        
-        /* ==================== NOTIFICATION ==================== */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .notification-success {
-            background-color: #27ae60;
-        }
-        
-        .notification-error {
-            background-color: #e74c3c;
-        }
-        
-        .notification-info {
-            background-color: #3498db;
-        }
-        
-        /* ==================== PRINT STYLES ==================== */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            .print-header {
-                text-align: center;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #000;
-                padding-bottom: 10px;
-            }
-        }
-        
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .courses-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .attendance-start-btn {
-                padding: 20px 30px;
-                font-size: 1.2rem;
-                max-width: 300px;
-            }
-            
-            .dashboard-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .quick-correction {
-                width: 90%;
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-        
-        /* ==================== ANIMATIONS ==================== */
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Custom JS (defer ব্যবহার করছি যাতে HTML লোড হওয়ার পর JS লোড হয়) -->
+    <script src="app.js" defer></script>
 </head>
 <body>
     <!-- Network Status Indicator -->
@@ -423,65 +42,63 @@
     </div>
     
     <!-- Welcome Screen -->
-    <div id="welcomeAd" class="hidden">
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000;">
-            <div style="background: white; padding: 40px; border-radius: 10px; text-align: center; max-width: 500px; width: 90%;">
-                <i class="fas fa-graduation-cap" style="font-size: 4rem; color: #3498db; margin-bottom: 20px; animation: pulse 2s infinite;"></i>
+    <div id="welcomeAd" class="welcome-screen hidden">
+        <div class="welcome-overlay">
+            <div class="welcome-content">
+                <i class="fas fa-graduation-cap welcome-icon"></i>
                 <h2>Welcome to Attendance System</h2>
                 <p>Department of Philosophy</p>
                 <p>University of Chittagong</p>
-                <div style="font-size: 2rem; color: #3498db; font-weight: bold; margin: 20px 0;">1</div>
-                <p style="font-size: 0.9rem; color: #95a5a6;">Loading system...</p>
+                <div class="welcome-number">1</div>
+                <p class="welcome-loading">Loading system...</p>
             </div>
         </div>
     </div>
     
     <!-- Login Screen -->
-    <div id="loginScreen" style="max-width: 400px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #2c3e50, #4a6491); color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0; font-size: 1.5rem;">Attendance System</h1>
+    <div id="loginScreen">
+        <div class="login-header">
+            <h1>Attendance System</h1>
             <p>Department of Philosophy</p>
         </div>
         
-        <div style="padding: 30px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <i class="fas fa-user-shield" style="font-size: 4rem; color: #3498db;"></i>
-                <h2 style="color: #2c3e50; margin: 10px 0 5px 0;">Teacher Login</h2>
-                <p style="color: #7f8c8d; font-size: 0.9rem;">Enter credentials to access the system</p>
+        <div class="login-body">
+            <div class="login-icon-section">
+                <i class="fas fa-user-shield login-icon"></i>
+                <h2>Teacher Login</h2>
+                <p>Enter credentials to access the system</p>
             </div>
             
             <form id="loginForm">
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 500;">Username</label>
-                    <input type="text" id="username" placeholder="Your username" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Your username" required>
                 </div>
                 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 500;">
+                <div class="form-group">
+                    <label for="teacherName">
                         <i class="fas fa-user-tie"></i> Teacher Name
                     </label>
-                    <input type="text" id="teacherName" placeholder="Enter your full name" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    <input type="text" id="teacherName" placeholder="Enter your full name" required>
                 </div>
                 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 500;">Password</label>
-                    <div style="position: relative;">
-                        <input type="password" id="password" placeholder="Your password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
-                        <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #7f8c8d; cursor: pointer; font-size: 1.2rem;">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" placeholder="Your password" required>
+                        <button type="button" id="togglePassword" class="password-toggle">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
                 
-                <div>
-                    <button type="submit" style="width: 100%; padding: 12px 25px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
                 
-                <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                <div class="demo-credentials">
                     <p><strong>Demo Access:</strong><br>Username: <code>teacher</code><br>Password: <code>philosophy123</code></p>
-                    <p style="color: #e74c3c; font-size: 0.8rem; margin-top: 10px;">Change these credentials for production use</p>
+                    <p class="demo-warning">Change these credentials for production use</p>
                 </div>
             </form>
         </div>
@@ -489,36 +106,34 @@
     
     <!-- Main Dashboard -->
     <div id="dashboardScreen" class="hidden">
-        <div style="background: linear-gradient(135deg, #2c3e50, #4a6491); color: white; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 1.5rem;">Attendance System</h1>
-                    <p>Department of Philosophy</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 15px; color: white; flex-wrap: wrap;">
-                    <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
-                    <span id="currentUser">Teacher</span>
-                    <button id="logoutBtn" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 5px 15px; border-radius: 3px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
+        <div class="dashboard-header">
+            <div class="header-content">
+                <h1>Attendance System</h1>
+                <p>Department of Philosophy</p>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="currentUser">Teacher</span>
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </div>
         
-        <div style="padding: 20px;">
-            <div class="dashboard-header">
-                <h2 style="margin: 0; color: #2c3e50;">Course List</h2>
+        <div class="dashboard-body">
+            <div class="dashboard-controls">
+                <h2>Course List</h2>
                 
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="addCourseBtn" style="padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                <div class="control-buttons">
+                    <button id="addCourseBtn" class="btn btn-primary">
                         <i class="fas fa-plus"></i> New Course
                     </button>
                     
-                    <button id="searchCorrectionBtn" style="padding: 12px 25px; background-color: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <button id="searchCorrectionBtn" class="btn btn-warning">
                         <i class="fas fa-search"></i> Search & Correct
                     </button>
                     
-                    <button id="dataManagementBtn" style="padding: 12px 25px; background-color: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <button id="dataManagementBtn" class="btn btn-info">
                         <i class="fas fa-database"></i> Data Management
                     </button>
                 </div>
@@ -529,48 +144,46 @@
             </div>
             
             <!-- Data Management Section -->
-            <div id="dataManagementSection" class="data-management" style="display: none;">
-                <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
-                    <i class="fas fa-database"></i> Data Management
-                </h3>
+            <div id="dataManagementSection" class="data-management hidden">
+                <h3><i class="fas fa-database"></i> Data Management</h3>
                 
-                <div style="margin-bottom: 20px;">
-                    <h4 style="color: #2c3e50;">Backup & Restore</h4>
+                <div class="data-section">
+                    <h4>Backup & Restore</h4>
                     <div class="backup-options">
-                        <button id="backupDataBtn" style="padding: 10px 20px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <button id="backupDataBtn" class="btn btn-success">
                             <i class="fas fa-download"></i> Backup Data
                         </button>
                         
-                        <label style="padding: 10px 20px; background-color: #3498db; color: white; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <label class="btn btn-primary file-upload">
                             <i class="fas fa-upload"></i> Restore Data
-                            <input type="file" id="restoreDataFile" accept=".json" style="display: none;">
+                            <input type="file" id="restoreDataFile" accept=".json">
                         </label>
                         
-                        <button id="clearAllDataBtn" style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <button id="clearAllDataBtn" class="btn btn-danger">
                             <i class="fas fa-trash-alt"></i> Clear All Data
                         </button>
                     </div>
                 </div>
                 
-                <div>
-                    <h4 style="color: #2c3e50;">Import Students (CSV)</h4>
-                    <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 10px;">
+                <div class="data-section">
+                    <h4>Import Students (CSV)</h4>
+                    <p class="file-format">
                         Format: student_id,student_name,year,department (one student per line)
                     </p>
-                    <div>
-                        <select id="importCourseSelect" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-right: 10px;">
+                    <div class="import-section">
+                        <select id="importCourseSelect">
                             <option value="">Select Course</option>
                         </select>
                         
-                        <label style="padding: 10px 20px; background-color: #f39c12; color: white; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        <label class="btn btn-warning file-upload">
                             <i class="fas fa-file-import"></i> Import CSV
-                            <input type="file" id="importCSVFile" accept=".csv,.txt" style="display: none;">
+                            <input type="file" id="importCSVFile" accept=".csv,.txt">
                         </label>
                     </div>
                 </div>
                 
-                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                    <button id="closeDataManagementBtn" style="padding: 8px 15px; background-color: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                <div class="data-management-footer">
+                    <button id="closeDataManagementBtn" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
@@ -579,78 +192,76 @@
     </div>
     
     <!-- Search & Correction Section -->
-    <div id="correctionSection" class="correction-section">
-        <h3 style="margin-top: 0; color: #2c3e50;">
-            <i class="fas fa-search"></i> Search & Correct Attendance
-        </h3>
+    <div id="correctionSection" class="correction-section hidden">
+        <h3><i class="fas fa-search"></i> Search & Correct Attendance</h3>
         
         <div class="correction-form">
-            <div>
-                <label style="display: block; margin-bottom: 5px; color: #2c3e50;">Date</label>
-                <input type="date" id="searchDate" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="searchDate" required>
             </div>
             
-            <div>
-                <label style="display: block; margin-bottom: 5px; color: #2c3e50;">Course</label>
-                <select id="searchCourse" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+            <div class="form-group">
+                <label>Course</label>
+                <select id="searchCourse" required>
                     <option value="">Select Course</option>
                 </select>
             </div>
             
-            <div>
-                <label style="display: block; margin-bottom: 5px; color: #2c3e50;">Student ID/Name</label>
-                <input type="text" id="searchStudentId" placeholder="Enter Student ID or Name" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+            <div class="form-group">
+                <label>Student ID/Name</label>
+                <input type="text" id="searchStudentId" placeholder="Enter Student ID or Name">
             </div>
         </div>
         
-        <div style="display: flex; gap: 10px;">
-            <button id="searchAttendanceBtn" style="padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+        <div class="correction-buttons">
+            <button id="searchAttendanceBtn" class="btn btn-primary">
                 <i class="fas fa-search"></i> Search
             </button>
-            <button id="closeCorrectionBtn" style="padding: 12px 25px; background-color: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+            <button id="closeCorrectionBtn" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Close
             </button>
         </div>
         
-        <div id="searchResults" style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px; display: none;">
+        <div id="searchResults" class="search-results hidden">
             <!-- Search results will appear here -->
         </div>
     </div>
     
     <!-- Attendance Page -->
     <div id="attendanceScreen" class="hidden">
-        <div style="background: linear-gradient(135deg, #2c3e50, #4a6491); color: white; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div class="attendance-header">
+            <div class="attendance-header-content">
                 <div>
-                    <h1 id="attendanceCourseTitle" style="margin: 0; font-size: 1.5rem;">Course Attendance</h1>
+                    <h1 id="attendanceCourseTitle">Course Attendance</h1>
                     <p id="attendanceCourseInfo">Course details</p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px; color: white; flex-wrap: wrap;">
+                <div class="attendance-user-info">
                     <i class="fas fa-user-circle"></i>
                     <span id="attendanceUser">Teacher</span>
                 </div>
             </div>
         </div>
         
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #ecf0f1; border-bottom: 1px solid #ddd; flex-wrap: wrap; gap: 15px;">
-            <div>
-                <div style="font-weight: bold; font-size: 1.1rem;" id="currentCourseTitle"></div>
-                <div style="color: #7f8c8d; font-size: 0.9rem;" id="attendanceDatesInfo"></div>
+        <div class="attendance-subheader">
+            <div class="course-info">
+                <div class="course-title" id="currentCourseTitle"></div>
+                <div class="course-details" id="attendanceDatesInfo"></div>
             </div>
             
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="attendanceStartBtn" style="padding: 12px 25px; background: linear-gradient(135deg, #3498db, #2c3e50); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+            <div class="attendance-controls">
+                <button id="attendanceStartBtn" class="btn btn-start">
                     <i class="fas fa-play-circle"></i> Start Attendance
                 </button>
-                <button id="shareAttendanceBtn" style="padding: 12px 25px; background-color: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                <button id="shareAttendanceBtn" class="btn btn-warning">
                     <i class="fas fa-share-alt"></i> Share
                 </button>
             </div>
         </div>
         
         <!-- Attendance Table Container -->
-        <div id="attendanceTableContainer" style="overflow-x: auto; padding: 20px; max-height: 70vh; display: none;">
-            <table style="width: 100%; border-collapse: collapse; min-width: 800px;" id="attendanceTable">
+        <div id="attendanceTableContainer" class="attendance-table-container hidden">
+            <table id="attendanceTable">
                 <thead id="attendanceTableHeader">
                     <!-- Headers will be generated dynamically -->
                 </thead>
@@ -660,34 +271,32 @@
             </table>
         </div>
         
-        <div style="display: flex; gap: 10px; padding: 20px; background: #f8f9fa; border-top: 1px solid #ddd; flex-wrap: wrap;">
-            <button id="backToDashboardBtn" style="padding: 12px 25px; background-color: #7f8c8d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: auto; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+        <div class="attendance-footer">
+            <button id="backToDashboardBtn" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </button>
-            <button id="exportExcelBtn" style="padding: 12px 25px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; display: none; transition: all 0.3s;">
+            <button id="exportExcelBtn" class="btn btn-success hidden">
                 <i class="fas fa-file-excel"></i> Excel Sheet
             </button>
-            <button id="printSheetBtn" style="padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; display: none; transition: all 0.3s;">
+            <button id="printSheetBtn" class="btn btn-primary hidden">
                 <i class="fas fa-print"></i> Print
             </button>
         </div>
         
         <!-- Share Options -->
-        <div id="shareOptions" style="padding: 20px; border-top: 1px solid #ddd; display: none;">
-            <h3 style="margin: 0 0 15px 0; color: #2c3e50;">
-                <i class="fas fa-share-alt"></i> Share Attendance
-            </h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button onclick="shareViaEmail()" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+        <div id="shareOptions" class="share-options hidden">
+            <h3><i class="fas fa-share-alt"></i> Share Attendance</h3>
+            <div class="share-buttons">
+                <button onclick="shareViaEmail()" class="btn btn-email">
                     <i class="fas fa-envelope"></i> Email
                 </button>
-                <button onclick="shareViaWhatsApp()" style="padding: 10px 15px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                <button onclick="shareViaWhatsApp()" class="btn btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </button>
-                <button onclick="copyToClipboard()" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                <button onclick="copyToClipboard()" class="btn btn-primary">
                     <i class="fas fa-copy"></i> Copy Link
                 </button>
-                <button onclick="document.getElementById('shareOptions').style.display = 'none'" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                <button onclick="hideShareOptions()" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Close
                 </button>
             </div>
@@ -695,15 +304,15 @@
     </div>
     
     <!-- Attendance Popup -->
-    <div id="attendancePopupOverlay" class="attendance-popup-overlay" style="display: none;">
-        <div style="background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); text-align: center;">
-            <div style="margin-bottom: 25px;">
-                <div style="font-size: 2.5rem; font-weight: bold; color: #2c3e50; margin-bottom: 10px;" id="popupStudentId">1001</div>
-                <div style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 5px;" id="popupStudentName">Student Name</div>
-                <div style="font-size: 0.9rem; color: #95a5a6; margin-bottom: 30px;" id="popupStudentDetails">1st Year | Philosophy</div>
+    <div id="attendancePopupOverlay" class="attendance-popup-overlay hidden">
+        <div class="attendance-popup">
+            <div class="popup-student-info">
+                <div class="student-id" id="popupStudentId">1001</div>
+                <div class="student-name" id="popupStudentName">Student Name</div>
+                <div class="student-details" id="popupStudentDetails">1st Year | Philosophy</div>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+            <div class="attendance-options">
                 <button class="attendance-option-btn present-btn" onclick="markAttendance('present')">
                     <i class="fas fa-check-circle"></i> Present ✓
                 </button>
@@ -712,18 +321,18 @@
                 </button>
             </div>
             
-            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #7f8c8d;">
+            <div class="progress-section">
+                <div class="progress-info">
                     <span id="currentProgress">0/0</span>
                     <span id="progressPercentage">0%</span>
                 </div>
-                <div style="height: 8px; background-color: #ecf0f1; border-radius: 4px; overflow: hidden;">
-                    <div id="progressFill" style="height: 100%; background: linear-gradient(90deg, #3498db, #2c3e50); border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
                 </div>
             </div>
             
-            <div style="margin-top: 20px; text-align: center;">
-                <button id="stopAttendanceBtn" style="width: 100%; padding: 12px 25px; background-color: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
+            <div class="popup-footer">
+                <button id="stopAttendanceBtn" class="btn btn-stop">
                     <i class="fas fa-stop-circle"></i> Stop Attendance
                 </button>
             </div>
@@ -731,1736 +340,55 @@
     </div>
     
     <!-- Quick Correction -->
-    <div id="quickCorrection" class="quick-correction">
-        <i class="fas fa-history" style="font-size: 1.2rem;"></i>
+    <div id="quickCorrection" class="quick-correction hidden">
+        <i class="fas fa-history"></i>
         <span id="quickCorrectionText">Last marked: Student ID - Present</span>
-        <button onclick="undoLastAttendance()" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
+        <button onclick="undoLastAttendance()" class="btn btn-undo">
             <i class="fas fa-undo"></i> Undo
         </button>
-        <button onclick="document.getElementById('quickCorrection').style.display = 'none'" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
+        <button onclick="hideQuickCorrection()" class="btn btn-dismiss">
             <i class="fas fa-times"></i> Dismiss
         </button>
     </div>
     
     <!-- PWA Install Prompt -->
-    <div id="installPrompt" class="install-prompt">
-        <h3 style="margin: 0 0 10px 0; color: #2c3e50;">
-            <i class="fas fa-download"></i> Install Attendance System
-        </h3>
-        <p style="color: #7f8c8d; margin: 0 0 15px 0;">Add to home screen for quick access</p>
-        <div style="display: flex; gap: 10px;">
-            <button id="installBtn" style="flex: 1; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
+    <div id="installPrompt" class="install-prompt hidden">
+        <h3><i class="fas fa-download"></i> Install Attendance System</h3>
+        <p>Add to home screen for quick access</p>
+        <div class="install-buttons">
+            <button id="installBtn" class="btn btn-install">
                 <i class="fas fa-download"></i> Install
             </button>
-            <button id="dismissInstallBtn" style="flex: 1; padding: 8px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
+            <button id="dismissInstallBtn" class="btn btn-dismiss-install">
                 <i class="fas fa-times"></i> Later
             </button>
         </div>
     </div>
 
+    <!-- Notification Container (Dynamically Created) -->
+    
+    <!-- JavaScript -->
     <script>
-// Auto-check for existing session on page load
-function checkAutoLogin() {
-    try {
-        const session = localStorage.getItem('attendanceSession');
-        if (session) {
-            const sessionData = JSON.parse(session);
-            const now = new Date().getTime();
+        // Initialize app
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
             
-            if (sessionData.expires > now) {
-                console.log('Auto-login from session');
-                appState.isAuthenticated = true;
-                appState.currentUser = sessionData.username;
-                appState.teacherName = sessionData.teacherName;
-                
-                // Show dashboard immediately
-                const loginEl = document.getElementById('loginScreen');
-                const dashboardEl = document.getElementById('dashboardScreen');
-                
-                if (loginEl && dashboardEl) {
-                    loginEl.style.display = 'none';
-                    dashboardEl.style.display = 'block';
-                    
-                    // Load courses after a delay
-                    setTimeout(() => {
-                        if (typeof loadCourses === 'function') {
-                            loadCourses();
-                        }
-                    }, 300);
-                }
-            }
-        }
-    } catch (e) {
-        console.log('Auto-login error:', e);
-    }
-}
-
-// Call on page load
-window.addEventListener('load', checkAutoLogin);
-       
-        // ==================== APP CONFIGURATION ====================
-        const SECURITY_CONFIG = {
-            users: [
-                {
-                    username: 'teacher',
-                    password: 'philosophy123',
-                    name: 'Demo Teacher'
-                },
-                // Add more users here for production
-                // { username: 'professor1', password: 'securepass123', name: 'Professor One' }
-            ],
-            sessionTimeout: 60 * 60 * 1000, // 1 hour
-            maxBackupFiles: 5,
-            dataVersion: '2.0'
-        };
-
-        // ==================== GLOBAL STATE ====================
-        let appState = {
-            isAuthenticated: false,
-            courses: [],
-            currentCourse: null,
-            currentUser: '',
-            teacherName: localStorage.getItem('teacherName') || '',
-            online: navigator.onLine
-        };
-
-        let attendanceState = {
-            isActive: false,
-            currentDate: null,
-            studentList: [],
-            currentIndex: 0
-        };
-
-        let LAST_ATTENDANCE = null;
-        let deferredPrompt = null;
-
-        // ==================== DOM ELEMENTS ====================
-        const loginScreen = document.getElementById('loginScreen');
-        const dashboardScreen = document.getElementById('dashboardScreen');
-        const attendanceScreen = document.getElementById('attendanceScreen');
-        const welcomeAd = document.getElementById('welcomeAd');
-        const loginForm = document.getElementById('loginForm');
-        const coursesGrid = document.getElementById('coursesGrid');
-        const onlineIndicator = document.getElementById('onlineIndicator');
-        const offlineIndicator = document.getElementById('offlineIndicator');
-
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show welcome screen for 1 second
-            welcomeAd.style.display = 'flex';
+            // Show welcome screen
+            document.getElementById('welcomeAd').classList.remove('hidden');
             
             setTimeout(() => {
-                welcomeAd.style.display = 'none';
+                document.getElementById('welcomeAd').classList.add('hidden');
+                
+                // Check auto login
+                if (!checkAutoLogin()) {
+                    // Show login screen
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                }
+                
+                // Initialize other components
                 initializeApp();
             }, 1000);
         });
-
-        function initializeApp() {
-            setupNetworkListeners();
-            checkExistingSession();
-            setupEventListeners();
-            setupServiceWorker();
-            setupPWAInstall();
-            
-            // Auto-fill teacher name if exists
-            if (appState.teacherName) {
-                document.getElementById('teacherName').value = appState.teacherName;
-            }
-            
-            // Show initial network status
-            updateNetworkStatus();
-        }
-
-        function setupNetworkListeners() {
-            window.addEventListener('online', () => {
-                appState.online = true;
-                updateNetworkStatus();
-                showNotification('Back online', 'success');
-                // Try to sync any pending data
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.ready.then(registration => {
-                        registration.sync.register('sync-attendance');
-                    });
-                }
-            });
-
-            window.addEventListener('offline', () => {
-                appState.online = false;
-                updateNetworkStatus();
-                showNotification('Working offline', 'info');
-            });
-        }
-
-        function updateNetworkStatus() {
-            if (appState.online) {
-                onlineIndicator.style.display = 'block';
-                offlineIndicator.style.display = 'none';
-            } else {
-                onlineIndicator.style.display = 'none';
-                offlineIndicator.style.display = 'block';
-            }
-        }
-
-        function setupServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        // GitHub Pages এর জন্য সঠিক path নির্ধারণ
-        const basePath = window.location.pathname.includes('attendance-system') 
-            ? '/attendance-system/' 
-            : '/';
-        const swUrl = basePath + 'service-worker.js';
-        
-        console.log('Registering Service Worker from:', swUrl);
-        
-        navigator.serviceWorker.register(swUrl, { 
-            scope: basePath  // সঠিক scope সেট করুন
-        })
-        .then(registration => {
-            console.log('✅ Service Worker registered successfully. Scope:', registration.scope);
-            
-            // Force update
-            registration.update();
-            
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                console.log('🔄 New Service Worker found. State:', newWorker.state);
-                
-                newWorker.addEventListener('statechange', () => {
-                    console.log('📊 Service Worker state changed to:', newWorker.state);
-                    
-                    if (newWorker.state === 'installed') {
-                        if (navigator.serviceWorker.controller) {
-                            console.log('🆕 New content available!');
-                            showNotification('নতুন আপডেট উপলব্ধ! রিফ্রেশ করুন।', 'info');
-                        } else {
-                            console.log('📱 Content is cached for offline use.');
-                        }
-                    }
-                    
-                    if (newWorker.state === 'activated') {
-                        console.log('🎯 Service Worker activated! Ready for offline use.');
-                        // Optional: Tell all tabs to reload
-                        if (registration.active) {
-                            registration.active.postMessage({ action: 'UPDATE_AVAILABLE' });
-                        }
-                    }
-                });
-            });
-            
-            // Check for controller
-            if (navigator.serviceWorker.controller) {
-                console.log('🎮 This page is controlled by Service Worker');
-            }
-        })
-        .catch(error => {
-            console.error('❌ Service Worker registration failed:', error);
-            
-            // Show user-friendly error
-            if (error.message.includes('MIME type')) {
-                console.warn('⚠️ Check if service-worker.js file exists on server');
-            }
-            
-            // Fallback: App will work without Service Worker
-            console.log('📝 Running without Service Worker features');
-        });
-    } else {
-        console.log('ℹ️ Service Worker not supported in this browser');
-    }
-}
-        function setupPWAInstall() {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                
-                // Only show prompt if not already installed
-                if (!window.matchMedia('(display-mode: standalone)').matches) {
-                    setTimeout(() => {
-                        document.getElementById('installPrompt').style.display = 'block';
-                    }, 3000);
-                }
-            });
-
-            document.getElementById('installBtn').addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log('User response to install prompt:', outcome);
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').style.display = 'none';
-                    
-                    if (outcome === 'accepted') {
-                        showNotification('App installed successfully!', 'success');
-                    }
-                }
-            });
-
-            document.getElementById('dismissInstallBtn').addEventListener('click', () => {
-                document.getElementById('installPrompt').style.display = 'none';
-                // Store dismissal preference
-                localStorage.setItem('pwaPromptDismissed', 'true');
-            });
-
-            // Check if already dismissed
-            if (localStorage.getItem('pwaPromptDismissed') === 'true') {
-                document.getElementById('installPrompt').style.display = 'none';
-            }
-        }
-
-        function checkExistingSession() {
-            const session = localStorage.getItem('attendanceSession');
-            if (session) {
-                try {
-                    const sessionData = JSON.parse(session);
-                    const now = new Date().getTime();
-                    
-                    if (sessionData.expires > now && sessionData.version === SECURITY_CONFIG.dataVersion) {
-                        appState.isAuthenticated = true;
-                        appState.currentUser = sessionData.username;
-                        appState.teacherName = sessionData.teacherName;
-                        showDashboard();
-                        loadCourses();
-                        return true;
-                    } else {
-                        // Session expired or version mismatch
-                        localStorage.removeItem('attendanceSession');
-                    }
-                } catch (error) {
-                    console.error('Invalid session data:', error);
-                    localStorage.removeItem('attendanceSession');
-                }
-            }
-            return false;
-        }
-
-        // ==================== LOGIN/LOGOUT ====================
-        loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    console.log('Login form submitted'); // Debug log
-    
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    const teacherName = document.getElementById('teacherName').value.trim();
-    
-    // Validate
-    if (!username || !password || !teacherName) {
-        showNotification('Please fill all fields', 'error');
-        return;
-    }
-    
-    // Check credentials
-    const user = SECURITY_CONFIG.users.find(u => 
-        u.username === username && u.password === password
-    );
-    
-    if (user) {
-        console.log('✅ Login successful for:', username);
-        
-        // Update app state
-        appState.isAuthenticated = true;
-        appState.currentUser = username;
-        appState.teacherName = teacherName || user.name;
-        
-        // Save session to localStorage
-        const sessionData = {
-            username: username,
-            teacherName: appState.teacherName,
-            expires: new Date().getTime() + SECURITY_CONFIG.sessionTimeout,
-            version: SECURITY_CONFIG.dataVersion
-        };
-        localStorage.setItem('attendanceSession', JSON.stringify(sessionData));
-        localStorage.setItem('teacherName', appState.teacherName);
-        
-        // ========== FIX: SHOW DASHBOARD ==========
-        const loginScreen = document.getElementById('loginScreen');
-        const dashboardScreen = document.getElementById('dashboardScreen');
-        
-        if (loginScreen && dashboardScreen) {
-            // METHOD 1: Direct style manipulation (most reliable)
-            loginScreen.style.display = 'none';
-            loginScreen.style.visibility = 'hidden';
-            loginScreen.style.opacity = '0';
-            loginScreen.style.height = '0';
-            loginScreen.style.overflow = 'hidden';
-            
-            dashboardScreen.style.display = 'block';
-            dashboardScreen.style.visibility = 'visible';
-            dashboardScreen.style.opacity = '1';
-            dashboardScreen.style.position = 'relative';
-            dashboardScreen.style.zIndex = '1000';
-            
-            console.log('✅ Dashboard should be visible now');
-            
-            // Update UI elements
-            document.getElementById('currentUser').textContent = appState.teacherName;
-            document.getElementById('attendanceUser').textContent = appState.teacherName;
-            
-            // Load courses
-            setTimeout(function() {
-                if (typeof loadCourses === 'function') {
-                    loadCourses();
-                    console.log('Courses loaded');
-                } else {
-                    console.warn('loadCourses function not found');
-                    // Fallback: load manually
-                    const saved = localStorage.getItem('attendanceCourses');
-                    if (saved) {
-                        try {
-                            const data = JSON.parse(saved);
-                            appState.courses = data.courses || [];
-                            if (typeof renderCourses === 'function') {
-                                renderCourses();
-                            }
-                        } catch (e) {
-                            console.error('Failed to load courses:', e);
-                        }
-                    }
-                }
-            }, 100);
-        } else {
-            console.error('❌ Screen elements not found!');
-            console.log('loginScreen:', loginScreen);
-            console.log('dashboardScreen:', dashboardScreen);
-        }
-        // ========== END FIX ==========
-        
-        showNotification('Login successful! Welcome ' + appState.teacherName, 'success');
-        
-        // Clear form (optional)
-        // loginForm.reset();
-        // document.getElementById('teacherName').value = appState.teacherName;
-        
-    } else {
-        console.log('❌ Login failed for:', username);
-        showNotification('Invalid username or password', 'error');
-    }
-});
-        // ==================== COURSE MANAGEMENT ====================
-        function loadCourses() {
-            const savedCourses = localStorage.getItem('attendanceCourses');
-            if (savedCourses) {
-                try {
-                    const data = JSON.parse(savedCourses);
-                    // Check data version
-                    if (data.version === SECURITY_CONFIG.dataVersion) {
-                        appState.courses = data.courses || [];
-                    } else {
-                        // Migrate data or load default
-                        appState.courses = migrateData(data);
-                    }
-                } catch (error) {
-                    console.error('Error loading courses:', error);
-                    loadDemoCourses();
-                }
-            } else {
-                loadDemoCourses();
-            }
-            
-            saveCourses();
-            renderCourses();
-            populateImportCourseSelect();
-        }
-
-        function migrateData(oldData) {
-            // Simple migration - in real app, implement proper migration
-            if (Array.isArray(oldData)) {
-                return oldData; // Old format was just array
-            } else if (oldData.courses) {
-                return oldData.courses;
-            }
-            return [];
-        }
-
-        function loadDemoCourses() {
-            appState.courses = [
-                {
-                    id: 'PHIL101',
-                    name: 'Introduction to Philosophy',
-                    year: '1',
-                    teacher: 'Dr. Ahmed Hossain',
-                    created: new Date().toISOString(),
-                    students: [
-                        { id: '2023001', name: 'Rahim Ahmed', year: '1', department: 'Philosophy' },
-                        { id: '2023002', name: 'Karim Khan', year: '1', department: 'Philosophy' },
-                        { id: '2023003', name: 'Salma Begum', year: '1', department: 'Philosophy' },
-                        { id: '2023004', name: 'Jamal Uddin', year: '1', department: 'Philosophy' }
-                    ],
-                    dates: [],
-                    attendance: {}
-                },
-                {
-                    id: 'PHIL201',
-                    name: 'Ethics and Moral Philosophy',
-                    year: '2',
-                    teacher: 'Prof. Fatima Rahman',
-                    created: new Date().toISOString(),
-                    students: [
-                        { id: '2022001', name: 'Ayesha Akter', year: '2', department: 'Philosophy' },
-                        { id: '2022002', name: 'Sohel Rana', year: '2', department: 'Philosophy' }
-                    ],
-                    dates: [],
-                    attendance: {}
-                }
-            ];
-        }
-
-        function saveCourses() {
-            const data = {
-                version: SECURITY_CONFIG.dataVersion,
-                courses: appState.courses,
-                lastUpdated: new Date().toISOString()
-            };
-            localStorage.setItem('attendanceCourses', JSON.stringify(data));
-        }
-
-        function renderCourses() {
-            coursesGrid.innerHTML = '';
-            
-            if (appState.courses.length === 0) {
-                coursesGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #7f8c8d;">
-                        <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <h3>No Courses Found</h3>
-                        <p>Create your first course to get started</p>
-                        <button id="addFirstCourseBtn" style="padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">
-                            <i class="fas fa-plus"></i> Create First Course
-                        </button>
-                    </div>
-                `;
-                document.getElementById('addFirstCourseBtn').addEventListener('click', showAddCourseModal);
-                return;
-            }
-            
-            appState.courses.forEach(course => {
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                
-                // Calculate attendance stats
-                const totalStudents = course.students.length;
-                const totalClasses = course.dates.length;
-                let totalAttendance = 0;
-                
-                if (totalClasses > 0) {
-                    course.students.forEach(student => {
-                        let presentCount = 0;
-                        course.dates.forEach(date => {
-                            if (course.attendance[date] && course.attendance[date][student.id] === 'present') {
-                                presentCount++;
-                            }
-                        });
-                        totalAttendance += presentCount;
-                    });
-                }
-                
-                const avgAttendance = totalClasses > 0 ? Math.round((totalAttendance / (totalStudents * totalClasses)) * 100) : 0;
-                
-                card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                        <div>
-                            <div style="font-weight: bold; font-size: 1.3rem; color: #2c3e50; margin-bottom: 5px;">${course.id}</div>
-                            <div style="color: #7f8c8d; font-size: 1.1rem;">${course.name}</div>
-                        </div>
-                        <div style="background: #ecf0f1; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; color: #2c3e50;">
-                            ${avgAttendance}%
-                        </div>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #5d6d7e; margin-bottom: 15px;">
-                        <div><strong><i class="fas fa-chalkboard-teacher"></i> Teacher:</strong> ${course.teacher}</div>
-                        <div><strong><i class="fas fa-users"></i> Students:</strong> ${totalStudents}</div>
-                        <div><strong><i class="fas fa-calendar-alt"></i> Classes:</strong> ${totalClasses}</div>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="course-action-btn" onclick="openCourse('${course.id}')" style="flex: 1; padding: 8px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="course-action-btn" onclick="deleteCourse('${course.id}')" style="padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
-                coursesGrid.appendChild(card);
-            });
-        }
-
-        function openCourse(courseId) {
-            const course = appState.courses.find(c => c.id === courseId);
-            if (!course) {
-                showNotification('Course not found', 'error');
-                return;
-            }
-            
-            appState.currentCourse = course;
-            
-            // Update UI
-            dashboardScreen.style.display = 'none';
-            attendanceScreen.style.display = 'block';
-            
-            // Set course info
-            document.getElementById('attendanceCourseTitle').textContent = course.name;
-            document.getElementById('attendanceCourseInfo').textContent = `${course.id} | ${course.teacher}`;
-            document.getElementById('currentCourseTitle').textContent = `${course.id} - ${course.name}`;
-            document.getElementById('attendanceDatesInfo').textContent = `${course.students.length} students | ${course.dates.length} classes`;
-            document.getElementById('attendanceUser').textContent = appState.teacherName;
-            
-            // Hide table initially
-            document.getElementById('attendanceTableContainer').style.display = 'none';
-            document.getElementById('exportExcelBtn').style.display = 'none';
-            document.getElementById('printSheetBtn').style.display = 'none';
-            document.getElementById('shareOptions').style.display = 'none';
-        }
-
-        function deleteCourse(courseId) {
-            if (!confirm(`Are you sure you want to delete course ${courseId}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            const courseIndex = appState.courses.findIndex(c => c.id === courseId);
-            if (courseIndex !== -1) {
-                appState.courses.splice(courseIndex, 1);
-                saveCourses();
-                renderCourses();
-                showNotification('Course deleted successfully', 'success');
-            }
-        }
-
-        // ==================== ATTENDANCE SYSTEM ====================
-        document.getElementById('attendanceStartBtn').addEventListener('click', startAttendance);
-        
-        function startAttendance() {
-            const course = appState.currentCourse;
-            if (!course || course.students.length === 0) {
-                showNotification('No students in this course', 'error');
-                return;
-            }
-            
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Initialize attendance for today
-            if (!course.dates.includes(today)) {
-                course.dates.push(today);
-            }
-            
-            if (!course.attendance[today]) {
-                course.attendance[today] = {};
-                // Set all students as absent initially
-                course.students.forEach(student => {
-                    course.attendance[today][student.id] = 'absent';
-                });
-            }
-            
-            saveCourses();
-            
-            // Setup attendance state
-            attendanceState = {
-                isActive: true,
-                currentDate: today,
-                studentList: [...course.students],
-                currentIndex: 0
-            };
-            
-            showNextStudent();
-        }
-
-        function showNextStudent() {
-            if (attendanceState.currentIndex >= attendanceState.studentList.length) {
-                completeAttendance();
-                return;
-            }
-            
-            const student = attendanceState.studentList[attendanceState.currentIndex];
-            
-            // Update popup
-            document.getElementById('popupStudentId').textContent = student.id;
-            document.getElementById('popupStudentName').textContent = student.name;
-            document.getElementById('popupStudentDetails').textContent = `${student.year} Year | ${student.department}`;
-            
-            // Update progress
-            const total = attendanceState.studentList.length;
-            const current = attendanceState.currentIndex + 1;
-            const percent = Math.round((current / total) * 100);
-            
-            document.getElementById('currentProgress').textContent = `${current}/${total}`;
-            document.getElementById('progressPercentage').textContent = `${percent}%`;
-            document.getElementById('progressFill').style.width = `${percent}%`;
-            
-            // Show popup
-            document.getElementById('attendancePopupOverlay').style.display = 'flex';
-        }
-
-        function markAttendance(status) {
-            if (!attendanceState.isActive) return;
-            
-            const student = attendanceState.studentList[attendanceState.currentIndex];
-            const course = appState.currentCourse;
-            
-            if (course && attendanceState.currentDate) {
-                const oldStatus = course.attendance[attendanceState.currentDate][student.id];
-                course.attendance[attendanceState.currentDate][student.id] = status;
-                
-                // Vibrate based on status
-                vibrate(status === 'present' ? [50] : [100, 50, 100]);
-                
-                // Show quick correction
-                showQuickCorrection(student.id, student.name, status, oldStatus);
-                
-                saveCourses();
-                
-                // Move to next student
-                attendanceState.currentIndex++;
-                
-                if (attendanceState.currentIndex < attendanceState.studentList.length) {
-                    setTimeout(showNextStudent, 300);
-                } else {
-                    completeAttendance();
-                }
-            }
-        }
-
-        function completeAttendance() {
-            document.getElementById('attendancePopupOverlay').style.display = 'none';
-            attendanceState.isActive = false;
-            
-            // Show table
-            document.getElementById('attendanceTableContainer').style.display = 'block';
-            document.getElementById('exportExcelBtn').style.display = 'flex';
-            document.getElementById('printSheetBtn').style.display = 'flex';
-            
-            renderAttendanceTable();
-            showNotification('Attendance completed!', 'success');
-        }
-
-        document.getElementById('stopAttendanceBtn').addEventListener('click', function() {
-            document.getElementById('attendancePopupOverlay').style.display = 'none';
-            attendanceState.isActive = false;
-            showNotification('Attendance stopped', 'info');
-        });
-
-        // ==================== QUICK CORRECTION ====================
-        function showQuickCorrection(studentId, studentName, status, oldStatus) {
-            LAST_ATTENDANCE = { 
-                studentId, 
-                studentName, 
-                status, 
-                oldStatus,
-                date: attendanceState.currentDate,
-                courseId: appState.currentCourse.id
-            };
-            
-            const statusText = status === 'present' ? 'Present ✓' : 'Absent ✗';
-            document.getElementById('quickCorrectionText').textContent = 
-                `${studentId} - ${studentName} marked as ${statusText}`;
-            
-            document.getElementById('quickCorrection').style.display = 'flex';
-            
-            // Auto hide after 10 seconds
-            setTimeout(() => {
-                if (document.getElementById('quickCorrection').style.display === 'flex') {
-                    document.getElementById('quickCorrection').style.display = 'none';
-                }
-            }, 10000);
-        }
-
-        function undoLastAttendance() {
-            if (!LAST_ATTENDANCE || !appState.currentCourse) return;
-            
-            const { studentId, oldStatus, date, courseId } = LAST_ATTENDANCE;
-            
-            if (appState.currentCourse.id !== courseId) {
-                showNotification('Cannot undo - different course', 'error');
-                return;
-            }
-            
-            const course = appState.currentCourse;
-            
-            if (course.attendance?.[date]?.[studentId]) {
-                // Restore old status
-                course.attendance[date][studentId] = oldStatus;
-                
-                saveCourses();
-                renderAttendanceTable();
-                showNotification(`Undo successful - ${studentId} restored to ${oldStatus}`, 'success');
-                vibrate([100, 50, 100]);
-            }
-            
-            document.getElementById('quickCorrection').style.display = 'none';
-            LAST_ATTENDANCE = null;
-        }
-
-        // ==================== EXCEL EXPORT ====================
-        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-        
-        async function exportToExcel() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            try {
-                // Show loading
-                const btn = document.getElementById('exportExcelBtn');
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-                btn.disabled = true;
-                
-                // Prepare data
-                const data = [];
-                
-                // Headers
-                const headers = ['Student ID', 'Student Name', 'Year', 'Department'];
-                course.dates.forEach(date => {
-                    const d = new Date(date);
-                    headers.push(d.toLocaleDateString('en-GB'));
-                });
-                headers.push('Present', 'Absent', 'Attendance %');
-                data.push(headers);
-                
-                // Student rows
-                course.students.forEach(student => {
-                    const row = [student.id, student.name, student.year, student.department];
-                    let presentCount = 0;
-                    let absentCount = 0;
-                    
-                    course.dates.forEach(date => {
-                        const status = course.attendance?.[date]?.[student.id] || 'absent';
-                        row.push(status === 'present' ? 'P' : 'A');
-                        if (status === 'present') presentCount++;
-                        else absentCount++;
-                    });
-                    
-                    const totalClasses = course.dates.length;
-                    const percentage = totalClasses > 0 
-                        ? ((presentCount / totalClasses) * 100).toFixed(2)
-                        : '0.00';
-                    
-                    row.push(presentCount, absentCount, percentage + '%');
-                    data.push(row);
-                });
-                
-                // Summary row
-                const summaryRow = ['SUMMARY', '', '', '', ...Array(course.dates.length).fill('')];
-                const totalStudents = course.students.length;
-                const totalClasses = course.dates.length;
-                let totalPresents = 0;
-                
-                course.dates.forEach(date => {
-                    let dayPresents = 0;
-                    course.students.forEach(student => {
-                        if (course.attendance?.[date]?.[student.id] === 'present') {
-                            dayPresents++;
-                        }
-                    });
-                    totalPresents += dayPresents;
-                });
-                
-                const overallPercentage = totalClasses > 0 && totalStudents > 0 
-                    ? ((totalPresents / (totalStudents * totalClasses)) * 100).toFixed(2)
-                    : '0.00';
-                
-                summaryRow.push('', '', `Overall: ${overallPercentage}%`);
-                data.push(summaryRow);
-                
-                // Create workbook
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                
-                // Style columns
-                const wscols = [
-                    {wch: 12}, // Student ID
-                    {wch: 25}, // Name
-                    {wch: 6},  // Year
-                    {wch: 15}, // Department
-                    ...Array(course.dates.length).fill({wch: 8}), // Dates
-                    {wch: 8},  // Present
-                    {wch: 8},  // Absent
-                    {wch: 12}  // Percentage
-                ];
-                ws['!cols'] = wscols;
-                
-                XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
-                
-                // Save file
-                const today = new Date().toISOString().split('T')[0];
-                const filename = `${course.id}_${course.year}_${today}.xlsx`;
-                XLSX.writeFile(wb, filename);
-                
-                showNotification(`Excel file "${filename}" downloaded`, 'success');
-                
-            } catch (error) {
-                console.error('Export error:', error);
-                showNotification('Failed to export: ' + error.message, 'error');
-            } finally {
-                const btn = document.getElementById('exportExcelBtn');
-                btn.innerHTML = '<i class="fas fa-file-excel"></i> Excel Sheet';
-                btn.disabled = false;
-            }
-        }
-
-        // ==================== PRINT FUNCTION ====================
-        document.getElementById('printSheetBtn').addEventListener('click', printAttendance);
-        
-        function printAttendance() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            // Create print view
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Attendance Sheet - ${course.id}</title>
-                    <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            margin: 20px; 
-                            color: #333;
-                        }
-                        .print-header { 
-                            text-align: center; 
-                            margin-bottom: 30px;
-                            border-bottom: 3px solid #2c3e50;
-                            padding-bottom: 15px;
-                        }
-                        .print-header h1 { 
-                            color: #2c3e50; 
-                            margin: 0 0 10px 0;
-                        }
-                        .course-info { 
-                            display: flex; 
-                            justify-content: space-between; 
-                            margin: 20px 0; 
-                            padding: 15px;
-                            background: #f8f9fa;
-                            border-radius: 5px;
-                        }
-                        table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            margin-top: 20px;
-                            font-size: 12px;
-                        }
-                        th, td { 
-                            border: 1px solid #ddd; 
-                            padding: 8px; 
-                            text-align: center; 
-                        }
-                        th { 
-                            background: #2c3e50; 
-                            color: white; 
-                            font-weight: bold;
-                        }
-                        .present { 
-                            background: #d5f4e6; 
-                            color: #27ae60;
-                            font-weight: bold;
-                        }
-                        .absent { 
-                            background: #fadbd8; 
-                            color: #e74c3c;
-                            font-weight: bold;
-                        }
-                        .summary-row { 
-                            background: #34495e; 
-                            color: white; 
-                            font-weight: bold;
-                        }
-                        @media print {
-                            @page { margin: 0.5cm; }
-                            body { margin: 0.5cm; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <h1>University of Chittagong</h1>
-                        <h2>Department of Philosophy</h2>
-                        <h3>Attendance Sheet</h3>
-                    </div>
-                    
-                    <div class="course-info">
-                        <div>
-                            <strong>Course:</strong> ${course.id} - ${course.name}<br>
-                            <strong>Teacher:</strong> ${course.teacher}<br>
-                            <strong>Year:</strong> ${course.year}
-                        </div>
-                        <div>
-                            <strong>Printed:</strong> ${new Date().toLocaleDateString('en-GB', { 
-                                day: 'numeric', 
-                                month: 'long', 
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}<br>
-                            <strong>Students:</strong> ${course.students.length}<br>
-                            <strong>Classes:</strong> ${course.dates.length}
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th rowspan="2">SL</th>
-                                <th rowspan="2">Student ID</th>
-                                <th rowspan="2">Name</th>
-            `);
-            
-            // Add dates in two rows
-            course.dates.forEach((date, index) => {
-                const d = new Date(date);
-                const day = d.toLocaleDateString('en-GB', { weekday: 'short' });
-                const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                printWindow.document.write(`<th colspan="2">${day}<br>${dateStr}</th>`);
-            });
-            
-            printWindow.document.write(`<th colspan="3">Summary</th></tr><tr>`);
-            
-            // Second header row
-            course.dates.forEach(() => {
-                printWindow.document.write(`<th>P</th><th>A</th>`);
-            });
-            
-            printWindow.document.write(`<th>Total</th><th>Present</th><th>%</th></tr></thead><tbody>`);
-            
-            // Add student rows
-            course.students.forEach((student, index) => {
-                printWindow.document.write(`<tr><td>${index + 1}</td><td>${student.id}</td><td>${student.name}</td>`);
-                
-                let presentCount = 0;
-                course.dates.forEach(date => {
-                    const status = course.attendance?.[date]?.[student.id] || 'absent';
-                    if (status === 'present') {
-                        printWindow.document.write(`<td class="present">✓</td><td class="absent"></td>`);
-                        presentCount++;
-                    } else {
-                        printWindow.document.write(`<td class="present"></td><td class="absent">✗</td>`);
-                    }
-                });
-                
-                const totalClasses = course.dates.length;
-                const percentage = totalClasses > 0 
-                    ? Math.round((presentCount / totalClasses) * 100)
-                    : 0;
-                
-                printWindow.document.write(`
-                    <td>${totalClasses}</td>
-                    <td>${presentCount}</td>
-                    <td><strong>${percentage}%</strong></td>
-                </tr>`);
-            });
-            
-            // Summary row
-            const totalStudents = course.students.length;
-            const totalClasses = course.dates.length;
-            let totalPresents = 0;
-            
-            course.dates.forEach(date => {
-                let dayPresents = 0;
-                course.students.forEach(student => {
-                    if (course.attendance?.[date]?.[student.id] === 'present') {
-                        dayPresents++;
-                    }
-                });
-                totalPresents += dayPresents;
-            });
-            
-            const overallPercentage = totalClasses > 0 && totalStudents > 0 
-                ? Math.round((totalPresents / (totalStudents * totalClasses)) * 100)
-                : 0;
-            
-            printWindow.document.write(`
-                <tr class="summary-row">
-                    <td colspan="3"><strong>TOTAL</strong></td>
-            `);
-            
-            course.dates.forEach(date => {
-                let dayPresents = 0;
-                course.students.forEach(student => {
-                    if (course.attendance?.[date]?.[student.id] === 'present') {
-                        dayPresents++;
-                    }
-                });
-                const dayAbsents = totalStudents - dayPresents;
-                printWindow.document.write(`<td>${dayPresents}</td><td>${dayAbsents}</td>`);
-            });
-            
-            printWindow.document.write(`
-                    <td>${totalStudents * totalClasses}</td>
-                    <td>${totalPresents}</td>
-                    <td><strong>${overallPercentage}%</strong></td>
-                </tr>
-            `);
-            
-            printWindow.document.write('</tbody></table></body></html>');
-            printWindow.document.close();
-            
-            // Print after a short delay to ensure content is loaded
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        }
-
-        // ==================== RENDER ATTENDANCE TABLE ====================
-        function renderAttendanceTable() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            const header = document.getElementById('attendanceTableHeader');
-            const body = document.getElementById('attendanceTableBody');
-            
-            // Clear existing
-            header.innerHTML = '';
-            body.innerHTML = '';
-            
-            // Create header
-            header.innerHTML = `
-                <th style="background: #2c3e50; color: white; padding: 12px; position: sticky; left: 0; z-index: 10;">
-                    <div>Student ID</div>
-                    <div style="font-weight: normal; font-size: 0.9rem;">Name</div>
-                </th>
-            `;
-            
-            course.dates.forEach(date => {
-                const d = new Date(date);
-                header.innerHTML += `
-                    <th style="background: #3498db; color: white; padding: 12px; width: 40px; min-width: 40px;">
-                        <div style="font-size: 0.8rem; font-weight: bold;">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</div>
-                        <div style="font-size: 0.7rem; font-weight: normal;">${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div>
-                    </th>
-                `;
-            });
-            
-            header.innerHTML += '<th style="background: #2c3e50; color: white; padding: 12px; position: sticky; right: 0; z-index: 10;">Avg</th>';
-            
-            // Create rows
-            course.students.forEach(student => {
-                const row = document.createElement('tr');
-                let presentCount = 0;
-                
-                // Student info cell
-                row.innerHTML = `
-                    <td style="background: #34495e; color: white; position: sticky; left: 0; padding: 10px; z-index: 5;">
-                        <div style="font-weight: bold;">${student.id}</div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">${student.name}</div>
-                    </td>
-                `;
-                
-                // Attendance cells
-                course.dates.forEach(date => {
-                    const status = course.attendance?.[date]?.[student.id] || 'absent';
-                    if (status === 'present') presentCount++;
-                    
-                    const bgColor = status === 'present' ? '#d5f4e6' : '#fadbd8';
-                    const color = status === 'present' ? '#27ae60' : '#e74c3c';
-                    const symbol = status === 'present' ? '✓' : '✗';
-                    
-                    row.innerHTML += `
-                        <td style="padding: 10px; text-align: center; background: ${bgColor}; color: ${color}; font-weight: bold; font-size: 1.2rem;">
-                            ${symbol}
-                        </td>
-                    `;
-                });
-                
-                // Average cell
-                const average = course.dates.length > 0 
-                    ? Math.round((presentCount / course.dates.length) * 100)
-                    : 0;
-                
-                const avgColor = average >= 75 ? '#27ae60' : average >= 50 ? '#f39c12' : '#e74c3c';
-                
-                row.innerHTML += `
-                    <td style="background: #2c3e50; color: white; position: sticky; right: 0; padding: 10px; text-align: center; font-weight: bold; z-index: 5;">
-                        <span style="color: ${avgColor};">${average}%</span>
-                    </td>
-                `;
-                
-                body.appendChild(row);
-            });
-        }
-
-        // ==================== SEARCH & CORRECTION ====================
-        document.getElementById('searchCorrectionBtn').addEventListener('click', function() {
-            const correctionSection = document.getElementById('correctionSection');
-            const isVisible = correctionSection.style.display === 'block';
-            correctionSection.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                document.getElementById('dataManagementSection').style.display = 'none';
-                populateSearchCourses();
-            }
-        });
-
-        document.getElementById('closeCorrectionBtn').addEventListener('click', function() {
-            document.getElementById('correctionSection').style.display = 'none';
-            document.getElementById('searchResults').style.display = 'none';
-        });
-
-        document.getElementById('searchAttendanceBtn').addEventListener('click', searchAttendance);
-        
-        function populateSearchCourses() {
-            const select = document.getElementById('searchCourse');
-            select.innerHTML = '<option value="">Select Course</option>';
-            
-            appState.courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = `${course.id} - ${course.name}`;
-                select.appendChild(option);
-            });
-        }
-        
-        function searchAttendance() {
-            const date = document.getElementById('searchDate').value;
-            const courseId = document.getElementById('searchCourse').value;
-            const searchTerm = document.getElementById('searchStudentId').value.trim().toLowerCase();
-            
-            if (!date || !courseId) {
-                showNotification('Please select date and course', 'error');
-                return;
-            }
-            
-            const course = appState.courses.find(c => c.id === courseId);
-            if (!course) return;
-            
-            // Check if date exists in course
-            if (!course.dates.includes(date)) {
-                showNotification('No attendance record for this date', 'error');
-                return;
-            }
-            
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '';
-            resultsDiv.style.display = 'block';
-            
-            let filteredStudents = course.students;
-            if (searchTerm) {
-                filteredStudents = filteredStudents.filter(s => 
-                    s.id.toLowerCase().includes(searchTerm) || 
-                    s.name.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            if (filteredStudents.length === 0) {
-                resultsDiv.innerHTML = `
-                    <div style="text-align: center; padding: 30px; color: #7f8c8d;">
-                        <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>No students found matching "${searchTerm}"</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Show date info
-            const dateObj = new Date(date);
-            resultsDiv.innerHTML += `
-                <div style="background: #3498db; color: white; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px;">
-                    <strong>Date:</strong> ${dateObj.toLocaleDateString('en-GB', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    })}
-                    <br><strong>Course:</strong> ${course.id} - ${course.name}
-                </div>
-            `;
-            
-            filteredStudents.forEach(student => {
-                const status = course.attendance?.[date]?.[student.id] || 'absent';
-                const card = document.createElement('div');
-                card.style.cssText = `
-                    background: white; border-left: 5px solid ${status === 'present' ? '#27ae60' : '#e74c3c'}; 
-                    padding: 15px; margin-bottom: 15px; border-radius: 5px; 
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.3s;
-                `;
-                
-                card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div>
-                            <div style="font-weight: bold; color: #2c3e50; font-size: 1.1rem;">${student.id}</div>
-                            <div style="color: #5d6d7e; margin: 5px 0;">${student.name}</div>
-                            <div style="font-size: 0.85rem; color: #7f8c8d;">
-                                ${student.year} Year | ${student.department}
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.2rem; font-weight: bold; color: ${status === 'present' ? '#27ae60' : '#e74c3c'}">
-                                ${status.toUpperCase()}
-                            </div>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button onclick="correctStudentAttendance('${courseId}', '${student.id}', '${date}', 'present')" 
-                                    style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
-                                    <i class="fas fa-check"></i> Mark Present
-                                </button>
-                                <button onclick="correctStudentAttendance('${courseId}', '${student.id}', '${date}', 'absent')" 
-                                    style="padding: 8px 15px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
-                                    <i class="fas fa-times"></i> Mark Absent
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                resultsDiv.appendChild(card);
-            });
-        }
-        
-        function correctStudentAttendance(courseId, studentId, date, newStatus) {
-            const course = appState.courses.find(c => c.id === courseId);
-            if (!course) return;
-            
-            if (!course.attendance[date]) {
-                course.attendance[date] = {};
-            }
-            
-            const oldStatus = course.attendance[date][studentId] || 'absent';
-            course.attendance[date][studentId] = newStatus;
-            saveCourses();
-            
-            // Update the displayed result
-            searchAttendance();
-            
-            showNotification(`Corrected ${studentId} from ${oldStatus} to ${newStatus}`, 'success');
-            vibrate([100, 50, 100]);
-        }
-
-        // ==================== DATA MANAGEMENT ====================
-        document.getElementById('dataManagementBtn').addEventListener('click', function() {
-            const dataSection = document.getElementById('dataManagementSection');
-            const isVisible = dataSection.style.display === 'block';
-            dataSection.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                document.getElementById('correctionSection').style.display = 'none';
-                populateImportCourseSelect();
-            }
-        });
-
-        document.getElementById('closeDataManagementBtn').addEventListener('click', function() {
-            document.getElementById('dataManagementSection').style.display = 'none';
-        });
-
-        document.getElementById('backupDataBtn').addEventListener('click', backupData);
-        
-        document.getElementById('restoreDataFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                restoreData(file);
-                e.target.value = ''; // Reset input
-            }
-        });
-        
-        document.getElementById('clearAllDataBtn').addEventListener('click', clearAllData);
-        
-        document.getElementById('importCSVFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const courseId = document.getElementById('importCourseSelect').value;
-            
-            if (!courseId) {
-                showNotification('Please select a course first', 'error');
-                e.target.value = ''; // Reset input
-                return;
-            }
-            
-            if (file) {
-                importStudentsFromCSV(file, courseId);
-                e.target.value = ''; // Reset input
-            }
-        });
-        
-        function populateImportCourseSelect() {
-            const select = document.getElementById('importCourseSelect');
-            select.innerHTML = '<option value="">Select Course</option>';
-            
-            appState.courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = `${course.id} - ${course.name}`;
-                select.appendChild(option);
-            });
-        }
-        
-        function backupData() {
-            try {
-                const backup = {
-                    version: SECURITY_CONFIG.dataVersion,
-                    courses: appState.courses,
-                    timestamp: new Date().toISOString(),
-                    teacherName: appState.teacherName,
-                    totalCourses: appState.courses.length,
-                    totalStudents: appState.courses.reduce((sum, course) => sum + course.students.length, 0)
-                };
-                
-                const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
-                const url = URL.createObjectURL(blob);
-                
-                const today = new Date().toISOString().split('T')[0];
-                const filename = `attendance-backup-${today}.json`;
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showNotification(`Backup saved as ${filename}`, 'success');
-                
-            } catch (error) {
-                console.error('Backup error:', error);
-                showNotification('Failed to create backup', 'error');
-            }
-        }
-        
-        function restoreData(file) {
-            if (!confirm('Restore will replace all current data. Continue?')) {
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const backup = JSON.parse(e.target.result);
-                    
-                    // Validate backup file
-                    if (!backup.version || !backup.courses || !Array.isArray(backup.courses)) {
-                        throw new Error('Invalid backup file format');
-                    }
-                    
-                    if (backup.version !== SECURITY_CONFIG.dataVersion) {
-                        if (!confirm(`Backup version (${backup.version}) differs from current (${SECURITY_CONFIG.dataVersion}). Continue anyway?`)) {
-                            return;
-                        }
-                    }
-                    
-                    appState.courses = backup.courses;
-                    if (backup.teacherName) {
-                        appState.teacherName = backup.teacherName;
-                        localStorage.setItem('teacherName', backup.teacherName);
-                    }
-                    
-                    saveCourses();
-                    renderCourses();
-                    
-                    showNotification(`Data restored successfully (${backup.courses.length} courses)`, 'success');
-                    
-                } catch (error) {
-                    console.error('Restore error:', error);
-                    showNotification('Failed to restore: ' + error.message, 'error');
-                }
-            };
-            reader.readAsText(file);
-        }
-        
-        function clearAllData() {
-            if (!confirm('WARNING: This will delete ALL data including courses, students, and attendance records. This action cannot be undone. Are you sure?')) {
-                return;
-            }
-            
-            if (!confirm('FINAL WARNING: All data will be permanently deleted. Type "DELETE" to confirm.')) {
-                return;
-            }
-            
-            const userInput = prompt('Type "DELETE" to confirm permanent deletion:');
-            if (userInput !== 'DELETE') {
-                showNotification('Deletion cancelled', 'info');
-                return;
-            }
-            
-            appState.courses = [];
-            localStorage.removeItem('attendanceCourses');
-            localStorage.removeItem('teacherName');
-            
-            renderCourses();
-            showNotification('All data has been cleared', 'success');
-        }
-        
-        async function importStudentsFromCSV(file, courseId) {
-            try {
-                const course = appState.courses.find(c => c.id === courseId);
-                if (!course) {
-                    showNotification('Course not found', 'error');
-                    return;
-                }
-                
-                const text = await file.text();
-                const lines = text.split('\n').filter(line => line.trim() !== '');
-                
-                if (lines.length === 0) {
-                    showNotification('CSV file is empty', 'error');
-                    return;
-                }
-                
-                const students = [];
-                let importedCount = 0;
-                let errorCount = 0;
-                
-                // Process each line (skip header if present)
-                const startIndex = lines[0].toLowerCase().includes('id') ? 1 : 0;
-                
-                for (let i = startIndex; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-                    
-                    // Handle quoted CSV values
-                    const values = [];
-                    let inQuotes = false;
-                    let currentValue = '';
-                    
-                    for (let j = 0; j < line.length; j++) {
-                        const char = line[j];
-                        
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            values.push(currentValue.trim());
-                            currentValue = '';
-                        } else {
-                            currentValue += char;
-                        }
-                    }
-                    values.push(currentValue.trim());
-                    
-                    // Remove quotes from values
-                    const cleanValues = values.map(v => v.replace(/^"|"$/g, ''));
-                    
-                    if (cleanValues.length >= 4) {
-                        const [id, name, year, department] = cleanValues;
-                        
-                        if (id && name) {
-                            // Check for duplicate ID
-                            if (!course.students.some(s => s.id === id)) {
-                                students.push({
-                                    id: id.trim(),
-                                    name: name.trim(),
-                                    year: (year || course.year).trim(),
-                                    department: (department || 'Philosophy').trim()
-                                });
-                                importedCount++;
-                            } else {
-                                console.warn(`Duplicate student ID: ${id}`);
-                                errorCount++;
-                            }
-                        } else {
-                            errorCount++;
-                        }
-                    } else {
-                        errorCount++;
-                    }
-                }
-                
-                if (importedCount > 0) {
-                    // Merge with existing students
-                    course.students = [...course.students, ...students];
-                    saveCourses();
-                    
-                    if (appState.currentCourse && appState.currentCourse.id === courseId) {
-                        renderAttendanceTable();
-                    }
-                    
-                    let message = `Imported ${importedCount} students`;
-                    if (errorCount > 0) {
-                        message += ` (${errorCount} errors)`;
-                    }
-                    
-                    showNotification(message, 'success');
-                } else {
-                    showNotification('No valid students found in CSV', 'error');
-                }
-                
-            } catch (error) {
-                console.error('CSV import error:', error);
-                showNotification('Failed to import CSV: ' + error.message, 'error');
-            }
-        }
-
-        // ==================== SHARE FUNCTIONS ====================
-        document.getElementById('shareAttendanceBtn').addEventListener('click', function() {
-            const shareOptions = document.getElementById('shareOptions');
-            shareOptions.style.display = shareOptions.style.display === 'block' ? 'none' : 'block';
-        });
-        
-        function shareViaEmail() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            const today = new Date().toLocaleDateString('en-GB');
-            const subject = `Attendance Report - ${course.id} - ${today}`;
-            const body = `
-Attendance Report
-================
-
-Course: ${course.id} - ${course.name}
-Teacher: ${appState.teacherName}
-Date: ${today}
-Total Students: ${course.students.length}
-Total Classes: ${course.dates.length}
-
-Attendance Summary:
-${course.dates.map(date => {
-    const dateObj = new Date(date);
-    let presentCount = 0;
-    course.students.forEach(student => {
-        if (course.attendance[date] && course.attendance[date][student.id] === 'present') {
-            presentCount++;
-        }
-    });
-    const percentage = Math.round((presentCount / course.students.length) * 100);
-    return `${dateObj.toLocaleDateString('en-GB')}: ${presentCount}/${course.students.length} (${percentage}%)`;
-}).join('\n')}
-
-Generated by: Attendance System - Department of Philosophy
-University of Chittagong
-            `.trim();
-            
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-        
-        function shareViaWhatsApp() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            const today = new Date().toLocaleDateString('en-GB');
-            const text = `*Attendance Report*\n\n*Course:* ${course.id} - ${course.name}\n*Teacher:* ${appState.teacherName}\n*Date:* ${today}\n*Students:* ${course.students.length}\n*Classes:* ${course.dates.length}\n\nView full report in Attendance System`;
-            
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-        
-        async function copyToClipboard() {
-            const course = appState.currentCourse;
-            if (!course) return;
-            
-            const today = new Date().toLocaleDateString('en-GB');
-            const text = `Attendance Report: ${course.id} - ${course.name}\nTeacher: ${appState.teacherName}\nDate: ${today}\nStudents: ${course.students.length}\nClasses: ${course.dates.length}`;
-            
-            try {
-                await navigator.clipboard.writeText(text);
-                showNotification('Copied to clipboard', 'success');
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showNotification('Copied to clipboard', 'success');
-            }
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
-        function showDashboard() {
-            loginScreen.style.display = 'none';
-            dashboardScreen.style.display = 'block';
-            attendanceScreen.style.display = 'none';
-            document.getElementById('correctionSection').style.display = 'none';
-            document.getElementById('dataManagementSection').style.display = 'none';
-            
-            // Update user info
-            document.getElementById('currentUser').textContent = appState.teacherName || appState.currentUser;
-        }
-        
-        document.getElementById('backToDashboardBtn').addEventListener('click', function() {
-            attendanceScreen.style.display = 'none';
-            dashboardScreen.style.display = 'block';
-            renderCourses();
-        });
-        
-        function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existing = document.querySelectorAll('.notification');
-            existing.forEach(n => {
-                n.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => n.remove(), 300);
-            });
-            
-            // Create notification
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOut 0.3s ease-out';
-                    setTimeout(() => notification.remove(), 300);
-                }
-            }, 5000);
-        }
-        
-        function vibrate(pattern = [100]) {
-            if ('vibrate' in navigator && appState.online) {
-                try {
-                    navigator.vibrate(pattern);
-                } catch (e) {
-                    console.log('Vibration not supported');
-                }
-            }
-        }
-
-        // ==================== EVENT LISTENERS SETUP ====================
-        function setupEventListeners() {
-            // Password toggle
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const input = document.getElementById('password');
-                const icon = this.querySelector('i');
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.className = 'fas fa-eye-slash';
-                } else {
-                    input.type = 'password';
-                    icon.className = 'fas fa-eye';
-                }
-            });
-            
-            // Add Course Button (basic implementation)
-            document.getElementById('addCourseBtn').addEventListener('click', function() {
-                showAddCourseModal();
-            });
-            
-            // Prevent form submission on Enter key in search fields
-            document.getElementById('searchStudentId').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    document.getElementById('searchAttendanceBtn').click();
-                }
-            });
-        }
-        
-        function showAddCourseModal() {
-            const courseId = prompt('Enter Course ID (e.g., PHIL101):');
-            if (!courseId) return;
-            
-            const courseName = prompt('Enter Course Name:');
-            if (!courseName) return;
-            
-            const year = prompt('Enter Year (1, 2, 3, 4):') || '1';
-            const teacher = prompt('Enter Teacher Name:', appState.teacherName) || appState.teacherName;
-            
-            const newCourse = {
-                id: courseId.toUpperCase(),
-                name: courseName,
-                year: year,
-                teacher: teacher,
-                created: new Date().toISOString(),
-                students: [],
-                dates: [],
-                attendance: {}
-            };
-            
-            appState.courses.push(newCourse);
-            saveCourses();
-            renderCourses();
-            
-            showNotification(`Course ${courseId} created successfully`, 'success');
-        }
     </script>
 </body>
-
 </html>
-
-
