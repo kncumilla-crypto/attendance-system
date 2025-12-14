@@ -10,8 +10,6 @@ const SECURITY_CONFIG = {
             password: 'philosophy123',
             name: 'Demo Teacher'
         }
-        // Add more users for production:
-        // { username: 'professor1', password: 'securepass123', name: 'Professor One' }
     ],
     sessionTimeout: 60 * 60 * 1000, // 1 hour in milliseconds
     maxBackupFiles: 5,
@@ -37,9 +35,6 @@ let attendanceState = {
 
 let LAST_ATTENDANCE = null;
 let deferredPrompt = null;
-
-// ==================== DOM ELEMENTS ====================
-let loginScreen, dashboardScreen, attendanceScreen, coursesGrid;
 
 // ==================== UTILITY FUNCTIONS ====================
 function showNotification(message, type = 'info') {
@@ -85,11 +80,11 @@ function updateNetworkStatus() {
     const offlineIndicator = document.getElementById('offlineIndicator');
     
     if (appState.online) {
-        onlineIndicator.style.display = 'block';
-        offlineIndicator.style.display = 'none';
+        if (onlineIndicator) onlineIndicator.style.display = 'block';
+        if (offlineIndicator) offlineIndicator.style.display = 'none';
     } else {
-        onlineIndicator.style.display = 'none';
-        offlineIndicator.style.display = 'block';
+        if (onlineIndicator) onlineIndicator.style.display = 'none';
+        if (offlineIndicator) offlineIndicator.style.display = 'block';
     }
 }
 
@@ -137,36 +132,45 @@ function showDashboard() {
     const dataManagementSection = document.getElementById('dataManagementSection');
     
     // Hide all screens
-    loginScreen.classList.add('hidden');
-    dashboardScreen.classList.add('hidden');
-    attendanceScreen.classList.add('hidden');
+    if (loginScreen) loginScreen.classList.add('hidden');
+    if (dashboardScreen) dashboardScreen.classList.add('hidden');
+    if (attendanceScreen) attendanceScreen.classList.add('hidden');
     if (correctionSection) correctionSection.classList.add('hidden');
     if (dataManagementSection) dataManagementSection.classList.add('hidden');
     
     // Show dashboard
-    dashboardScreen.classList.remove('hidden');
-    
-    // Update user info
-    document.getElementById('currentUser').textContent = appState.teacherName;
+    if (dashboardScreen) {
+        dashboardScreen.classList.remove('hidden');
+        
+        // Update user info
+        const currentUserEl = document.getElementById('currentUser');
+        if (currentUserEl) {
+            currentUserEl.textContent = appState.teacherName;
+        }
+    }
     
     console.log('Dashboard shown');
 }
 
 function showLoginScreen() {
-    document.getElementById('dashboardScreen').classList.add('hidden');
-    document.getElementById('attendanceScreen').classList.add('hidden');
-    document.getElementById('correctionSection').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+    const attendanceScreen = document.getElementById('attendanceScreen');
+    const correctionSection = document.getElementById('correctionSection');
+    const loginScreen = document.getElementById('loginScreen');
+    
+    if (dashboardScreen) dashboardScreen.classList.add('hidden');
+    if (attendanceScreen) attendanceScreen.classList.add('hidden');
+    if (correctionSection) correctionSection.classList.add('hidden');
+    if (loginScreen) loginScreen.classList.remove('hidden');
 }
 
 // ==================== LOGIN/LOGOUT ====================
 function handleLogin(e) {
-    e.preventDefault();
-    console.log('Login attempt');
+    if (e) e.preventDefault();
     
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    const teacherName = document.getElementById('teacherName').value.trim();
+    const username = document.getElementById('username')?.value?.trim();
+    const password = document.getElementById('password')?.value;
+    const teacherName = document.getElementById('teacherName')?.value?.trim();
     
     // Validate inputs
     if (!username || !password || !teacherName) {
@@ -221,7 +225,8 @@ function handleLogout() {
         showLoginScreen();
         
         // Clear form
-        document.getElementById('loginForm').reset();
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) loginForm.reset();
         
         showNotification('Logged out successfully', 'success');
     }
@@ -230,12 +235,14 @@ function handleLogout() {
 function togglePasswordVisibility() {
     const input = document.getElementById('password');
     const icon = this.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
+    if (input && icon) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
     }
 }
 
@@ -338,7 +345,10 @@ function renderCourses() {
             </div>
         `;
         
-        document.getElementById('addFirstCourseBtn').addEventListener('click', showAddCourseModal);
+        const addFirstBtn = document.getElementById('addFirstCourseBtn');
+        if (addFirstBtn) {
+            addFirstBtn.addEventListener('click', showAddCourseModal);
+        }
         return;
     }
     
@@ -452,26 +462,43 @@ function openCourse(courseId) {
     appState.currentCourse = course;
     
     // Hide other screens
-    document.getElementById('dashboardScreen').classList.add('hidden');
-    document.getElementById('correctionSection').classList.add('hidden');
-    document.getElementById('dataManagementSection').classList.add('hidden');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+    const correctionSection = document.getElementById('correctionSection');
+    const dataManagementSection = document.getElementById('dataManagementSection');
+    
+    if (dashboardScreen) dashboardScreen.classList.add('hidden');
+    if (correctionSection) correctionSection.classList.add('hidden');
+    if (dataManagementSection) dataManagementSection.classList.add('hidden');
     
     // Show attendance screen
     const attendanceScreen = document.getElementById('attendanceScreen');
-    attendanceScreen.classList.remove('hidden');
-    
-    // Set course info
-    document.getElementById('attendanceCourseTitle').textContent = course.name;
-    document.getElementById('attendanceCourseInfo').textContent = `${course.id} | ${course.teacher}`;
-    document.getElementById('currentCourseTitle').textContent = `${course.id} - ${course.name}`;
-    document.getElementById('attendanceDatesInfo').textContent = `${course.students.length} students | ${course.dates.length} classes`;
-    document.getElementById('attendanceUser').textContent = appState.teacherName;
-    
-    // Hide table initially
-    document.getElementById('attendanceTableContainer').classList.add('hidden');
-    document.getElementById('exportExcelBtn').classList.add('hidden');
-    document.getElementById('printSheetBtn').classList.add('hidden');
-    document.getElementById('shareOptions').classList.add('hidden');
+    if (attendanceScreen) {
+        attendanceScreen.classList.remove('hidden');
+        
+        // Set course info
+        const courseTitle = document.getElementById('attendanceCourseTitle');
+        const courseInfo = document.getElementById('attendanceCourseInfo');
+        const currentCourseTitle = document.getElementById('currentCourseTitle');
+        const datesInfo = document.getElementById('attendanceDatesInfo');
+        const attendanceUser = document.getElementById('attendanceUser');
+        
+        if (courseTitle) courseTitle.textContent = course.name;
+        if (courseInfo) courseInfo.textContent = `${course.id} | ${course.teacher}`;
+        if (currentCourseTitle) currentCourseTitle.textContent = `${course.id} - ${course.name}`;
+        if (datesInfo) datesInfo.textContent = `${course.students.length} students | ${course.dates.length} classes`;
+        if (attendanceUser) attendanceUser.textContent = appState.teacherName;
+        
+        // Hide table initially
+        const tableContainer = document.getElementById('attendanceTableContainer');
+        const exportBtn = document.getElementById('exportExcelBtn');
+        const printBtn = document.getElementById('printSheetBtn');
+        const shareOptions = document.getElementById('shareOptions');
+        
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (exportBtn) exportBtn.classList.add('hidden');
+        if (printBtn) printBtn.classList.add('hidden');
+        if (shareOptions) shareOptions.classList.add('hidden');
+    }
     
     console.log('Course opened:', courseId);
 }
@@ -522,21 +549,30 @@ function showNextStudent() {
     const student = attendanceState.studentList[attendanceState.currentIndex];
     
     // Update popup
-    document.getElementById('popupStudentId').textContent = student.id;
-    document.getElementById('popupStudentName').textContent = student.name;
-    document.getElementById('popupStudentDetails').textContent = `${student.year} Year | ${student.department}`;
+    const studentIdEl = document.getElementById('popupStudentId');
+    const studentNameEl = document.getElementById('popupStudentName');
+    const studentDetailsEl = document.getElementById('popupStudentDetails');
+    
+    if (studentIdEl) studentIdEl.textContent = student.id;
+    if (studentNameEl) studentNameEl.textContent = student.name;
+    if (studentDetailsEl) studentDetailsEl.textContent = `${student.year} Year | ${student.department}`;
     
     // Update progress
     const total = attendanceState.studentList.length;
     const current = attendanceState.currentIndex + 1;
     const percent = Math.round((current / total) * 100);
     
-    document.getElementById('currentProgress').textContent = `${current}/${total}`;
-    document.getElementById('progressPercentage').textContent = `${percent}%`;
-    document.getElementById('progressFill').style.width = `${percent}%`;
+    const currentProgressEl = document.getElementById('currentProgress');
+    const progressPercentageEl = document.getElementById('progressPercentage');
+    const progressFillEl = document.getElementById('progressFill');
+    
+    if (currentProgressEl) currentProgressEl.textContent = `${current}/${total}`;
+    if (progressPercentageEl) progressPercentageEl.textContent = `${percent}%`;
+    if (progressFillEl) progressFillEl.style.width = `${percent}%`;
     
     // Show popup
-    document.getElementById('attendancePopupOverlay').classList.remove('hidden');
+    const popupOverlay = document.getElementById('attendancePopupOverlay');
+    if (popupOverlay) popupOverlay.classList.remove('hidden');
 }
 
 function markAttendance(status) {
@@ -569,13 +605,19 @@ function markAttendance(status) {
 }
 
 function completeAttendance() {
-    document.getElementById('attendancePopupOverlay').classList.add('hidden');
+    const popupOverlay = document.getElementById('attendancePopupOverlay');
+    if (popupOverlay) popupOverlay.classList.add('hidden');
+    
     attendanceState.isActive = false;
     
     // Show table
-    document.getElementById('attendanceTableContainer').classList.remove('hidden');
-    document.getElementById('exportExcelBtn').classList.remove('hidden');
-    document.getElementById('printSheetBtn').classList.remove('hidden');
+    const tableContainer = document.getElementById('attendanceTableContainer');
+    const exportBtn = document.getElementById('exportExcelBtn');
+    const printBtn = document.getElementById('printSheetBtn');
+    
+    if (tableContainer) tableContainer.classList.remove('hidden');
+    if (exportBtn) exportBtn.classList.remove('hidden');
+    if (printBtn) printBtn.classList.remove('hidden');
     
     renderAttendanceTable();
     showNotification('Attendance completed!', 'success');
@@ -593,17 +635,22 @@ function showQuickCorrection(studentId, studentName, status, oldStatus) {
     };
     
     const statusText = status === 'present' ? 'Present ✓' : 'Absent ✗';
-    document.getElementById('quickCorrectionText').textContent = 
-        `${studentId} - ${studentName} marked as ${statusText}`;
+    const quickCorrectionText = document.getElementById('quickCorrectionText');
+    if (quickCorrectionText) {
+        quickCorrectionText.textContent = `${studentId} - ${studentName} marked as ${statusText}`;
+    }
     
-    document.getElementById('quickCorrection').classList.remove('hidden');
-    
-    // Auto hide after 10 seconds
-    setTimeout(() => {
-        if (!document.getElementById('quickCorrection').classList.contains('hidden')) {
-            document.getElementById('quickCorrection').classList.add('hidden');
-        }
-    }, 10000);
+    const quickCorrection = document.getElementById('quickCorrection');
+    if (quickCorrection) {
+        quickCorrection.classList.remove('hidden');
+        
+        // Auto hide after 10 seconds
+        setTimeout(() => {
+            if (quickCorrection && !quickCorrection.classList.contains('hidden')) {
+                quickCorrection.classList.add('hidden');
+            }
+        }, 10000);
+    }
 }
 
 function undoLastAttendance() {
@@ -628,12 +675,15 @@ function undoLastAttendance() {
         vibrate([100, 50, 100]);
     }
     
-    document.getElementById('quickCorrection').classList.add('hidden');
+    const quickCorrection = document.getElementById('quickCorrection');
+    if (quickCorrection) quickCorrection.classList.add('hidden');
+    
     LAST_ATTENDANCE = null;
 }
 
 function hideQuickCorrection() {
-    document.getElementById('quickCorrection').classList.add('hidden');
+    const quickCorrection = document.getElementById('quickCorrection');
+    if (quickCorrection) quickCorrection.classList.add('hidden');
 }
 
 // ==================== ATTENDANCE TABLE RENDERING ====================
@@ -643,6 +693,8 @@ function renderAttendanceTable() {
     
     const header = document.getElementById('attendanceTableHeader');
     const body = document.getElementById('attendanceTableBody');
+    
+    if (!header || !body) return;
     
     // Clear existing
     header.innerHTML = '';
@@ -719,6 +771,8 @@ async function exportToExcel() {
     try {
         // Show loading
         const btn = document.getElementById('exportExcelBtn');
+        if (!btn) return;
+        
         const originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
         btn.disabled = true;
@@ -811,8 +865,10 @@ async function exportToExcel() {
         showNotification('Failed to export: ' + error.message, 'error');
     } finally {
         const btn = document.getElementById('exportExcelBtn');
-        btn.innerHTML = '<i class="fas fa-file-excel"></i> Excel Sheet';
-        btn.disabled = false;
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-file-excel"></i> Excel Sheet';
+            btn.disabled = false;
+        }
     }
 }
 
@@ -823,6 +879,11 @@ function printAttendance() {
     
     // Create print view
     const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        showNotification('Please allow popups to print', 'error');
+        return;
+    }
+    
     printWindow.document.write(`
         <html>
         <head>
@@ -1021,21 +1082,30 @@ function printAttendance() {
 // ==================== SEARCH & CORRECTION ====================
 function toggleCorrectionSection() {
     const correctionSection = document.getElementById('correctionSection');
+    if (!correctionSection) return;
+    
     const isVisible = !correctionSection.classList.contains('hidden');
     
     if (isVisible) {
         correctionSection.classList.add('hidden');
     } else {
         correctionSection.classList.remove('hidden');
-        document.getElementById('dataManagementSection').classList.add('hidden');
+        const dataManagementSection = document.getElementById('dataManagementSection');
+        if (dataManagementSection) dataManagementSection.classList.add('hidden');
         populateSearchCourses();
     }
 }
 
 function searchAttendance() {
-    const date = document.getElementById('searchDate').value;
-    const courseId = document.getElementById('searchCourse').value;
-    const searchTerm = document.getElementById('searchStudentId').value.trim().toLowerCase();
+    const dateInput = document.getElementById('searchDate');
+    const courseSelect = document.getElementById('searchCourse');
+    const studentIdInput = document.getElementById('searchStudentId');
+    
+    if (!dateInput || !courseSelect || !studentIdInput) return;
+    
+    const date = dateInput.value;
+    const courseId = courseSelect.value;
+    const searchTerm = studentIdInput.value.trim().toLowerCase();
     
     if (!date || !courseId) {
         showNotification('Please select date and course', 'error');
@@ -1052,6 +1122,8 @@ function searchAttendance() {
     }
     
     const resultsDiv = document.getElementById('searchResults');
+    if (!resultsDiv) return;
+    
     resultsDiv.innerHTML = '';
     resultsDiv.classList.remove('hidden');
     
@@ -1063,7 +1135,7 @@ function searchAttendance() {
         );
     }
     
-    if (filteredStudents.length === 0) {
+    if (filterledStudents.length === 0) {
         resultsDiv.innerHTML = `
             <div style="text-align: center; padding: 30px; color: #7f8c8d;">
                 <i class="fas fa-search"></i>
@@ -1144,6 +1216,8 @@ function correctStudentAttendance(courseId, studentId, date, newStatus) {
 
 function populateSearchCourses() {
     const select = document.getElementById('searchCourse');
+    if (!select) return;
+    
     select.innerHTML = '<option value="">Select Course</option>';
     
     appState.courses.forEach(course => {
@@ -1157,13 +1231,16 @@ function populateSearchCourses() {
 // ==================== DATA MANAGEMENT ====================
 function toggleDataManagement() {
     const dataSection = document.getElementById('dataManagementSection');
+    if (!dataSection) return;
+    
     const isVisible = !dataSection.classList.contains('hidden');
     
     if (isVisible) {
         dataSection.classList.add('hidden');
     } else {
         dataSection.classList.remove('hidden');
-        document.getElementById('correctionSection').classList.add('hidden');
+        const correctionSection = document.getElementById('correctionSection');
+        if (correctionSection) correctionSection.classList.add('hidden');
         populateImportCourseSelect();
     }
 }
@@ -1266,6 +1343,8 @@ function clearAllData() {
 
 function populateImportCourseSelect() {
     const select = document.getElementById('importCourseSelect');
+    if (!select) return;
+    
     select.innerHTML = '<option value="">Select Course</option>';
     
     appState.courses.forEach(course => {
@@ -1429,96 +1508,137 @@ async function copyToClipboard() {
 }
 
 function hideShareOptions() {
-    document.getElementById('shareOptions').classList.add('hidden');
+    const shareOptions = document.getElementById('shareOptions');
+    if (shareOptions) shareOptions.classList.add('hidden');
 }
 
 // ==================== EVENT LISTENERS SETUP ====================
 function setupEventListeners() {
     console.log('Setting up event listeners...');
     
+    // Safe event listener function
+    const safeAddEventListener = (id, event, handler) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+            console.log(`✓ Event listener added for: ${id}`);
+            return true;
+        } else {
+            console.warn(`✗ Element not found: ${id}`);
+            return false;
+        }
+    };
+    
     // Login Form
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    safeAddEventListener('loginForm', 'submit', handleLogin);
     
     // Logout Button
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    safeAddEventListener('logoutBtn', 'click', handleLogout);
     
     // Password Toggle
-    document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+    safeAddEventListener('togglePassword', 'click', togglePasswordVisibility);
     
     // Dashboard Navigation
-    document.getElementById('backToDashboardBtn').addEventListener('click', showDashboard);
-    document.getElementById('addCourseBtn').addEventListener('click', showAddCourseModal);
-    document.getElementById('searchCorrectionBtn').addEventListener('click', toggleCorrectionSection);
-    document.getElementById('dataManagementBtn').addEventListener('click', toggleDataManagement);
+    safeAddEventListener('backToDashboardBtn', 'click', showDashboard);
+    safeAddEventListener('addCourseBtn', 'click', showAddCourseModal);
+    safeAddEventListener('searchCorrectionBtn', 'click', toggleCorrectionSection);
+    safeAddEventListener('dataManagementBtn', 'click', toggleDataManagement);
     
     // Attendance Controls
-    document.getElementById('attendanceStartBtn').addEventListener('click', startAttendance);
-    document.getElementById('stopAttendanceBtn').addEventListener('click', function() {
-        document.getElementById('attendancePopupOverlay').classList.add('hidden');
+    safeAddEventListener('attendanceStartBtn', 'click', startAttendance);
+    
+    // Stop Attendance Button
+    safeAddEventListener('stopAttendanceBtn', 'click', function() {
+        const popupOverlay = document.getElementById('attendancePopupOverlay');
+        if (popupOverlay) popupOverlay.classList.add('hidden');
         attendanceState.isActive = false;
         showNotification('Attendance stopped', 'info');
     });
     
-    // Attendance Buttons
-    document.getElementById('presentBtn').addEventListener('click', function() {
+    // Attendance Buttons (Popup)
+    safeAddEventListener('presentBtn', 'click', function() {
         markAttendance('present');
     });
-    document.getElementById('absentBtn').addEventListener('click', function() {
+    
+    safeAddEventListener('absentBtn', 'click', function() {
         markAttendance('absent');
     });
     
     // Export/Print
-    document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-    document.getElementById('printSheetBtn').addEventListener('click', printAttendance);
+    safeAddEventListener('exportExcelBtn', 'click', exportToExcel);
+    safeAddEventListener('printSheetBtn', 'click', printAttendance);
     
     // Share Options
-    document.getElementById('shareAttendanceBtn').addEventListener('click', function() {
-        document.getElementById('shareOptions').classList.remove('hidden');
+    safeAddEventListener('shareAttendanceBtn', 'click', function() {
+        const shareOptions = document.getElementById('shareOptions');
+        if (shareOptions) shareOptions.classList.remove('hidden');
     });
-    document.getElementById('shareEmailBtn').addEventListener('click', shareViaEmail);
-    document.getElementById('shareWhatsappBtn').addEventListener('click', shareViaWhatsApp);
-    document.getElementById('copyLinkBtn').addEventListener('click', copyToClipboard);
-    document.getElementById('closeShareBtn').addEventListener('click', hideShareOptions);
+    
+    safeAddEventListener('shareEmailBtn', 'click', shareViaEmail);
+    safeAddEventListener('shareWhatsappBtn', 'click', shareViaWhatsApp);
+    safeAddEventListener('copyLinkBtn', 'click', copyToClipboard);
+    safeAddEventListener('closeShareBtn', 'click', hideShareOptions);
     
     // Quick Correction
-    document.getElementById('undoBtn').addEventListener('click', undoLastAttendance);
-    document.getElementById('dismissQuickBtn').addEventListener('click', hideQuickCorrection);
+    safeAddEventListener('undoBtn', 'click', undoLastAttendance);
+    safeAddEventListener('dismissQuickBtn', 'click', hideQuickCorrection);
     
     // Search & Correction
-    document.getElementById('searchAttendanceBtn').addEventListener('click', searchAttendance);
-    document.getElementById('closeCorrectionBtn').addEventListener('click', function() {
-        document.getElementById('correctionSection').classList.add('hidden');
-        document.getElementById('searchResults').classList.add('hidden');
+    safeAddEventListener('searchAttendanceBtn', 'click', searchAttendance);
+    safeAddEventListener('closeCorrectionBtn', 'click', function() {
+        const correctionSection = document.getElementById('correctionSection');
+        const searchResults = document.getElementById('searchResults');
+        
+        if (correctionSection) correctionSection.classList.add('hidden');
+        if (searchResults) searchResults.classList.add('hidden');
     });
     
     // Data Management
-    document.getElementById('backupDataBtn').addEventListener('click', backupData);
-    document.getElementById('restoreDataFile').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            restoreData(file);
-            e.target.value = '';
-        }
+    safeAddEventListener('backupDataBtn', 'click', backupData);
+    
+    const restoreFile = document.getElementById('restoreDataFile');
+    if (restoreFile) {
+        restoreFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                restoreData(file);
+                e.target.value = '';
+            }
+        });
+    }
+    
+    safeAddEventListener('clearAllDataBtn', 'click', clearAllData);
+    
+    const importCSV = document.getElementById('importCSVFile');
+    if (importCSV) {
+        importCSV.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const courseId = document.getElementById('importCourseSelect')?.value;
+            
+            if (!courseId) {
+                showNotification('Please select a course first', 'error');
+                e.target.value = '';
+                return;
+            }
+            
+            if (file) {
+                importStudentsFromCSV(file, courseId);
+                e.target.value = '';
+            }
+        });
+    }
+    
+    safeAddEventListener('closeDataManagementBtn', 'click', function() {
+        const dataManagementSection = document.getElementById('dataManagementSection');
+        if (dataManagementSection) dataManagementSection.classList.add('hidden');
     });
-    document.getElementById('clearAllDataBtn').addEventListener('click', clearAllData);
-    document.getElementById('importCSVFile').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const courseId = document.getElementById('importCourseSelect').value;
-        
-        if (!courseId) {
-            showNotification('Please select a course first', 'error');
-            e.target.value = '';
-            return;
-        }
-        
-        if (file) {
-            importStudentsFromCSV(file, courseId);
-            e.target.value = '';
-        }
-    });
-    document.getElementById('closeDataManagementBtn').addEventListener('click', function() {
-        document.getElementById('dataManagementSection').classList.add('hidden');
-    });
+    
+    console.log('All event listeners setup complete');
+}
+
+// শুধুমাত্র অপরিহার্য listeners (Auto-login-এর জন্য)
+function setupEssentialListeners() {
+    console.log('Setting up essential listeners for auto-login...');
     
     // Network Status
     window.addEventListener('online', () => {
@@ -1538,37 +1658,17 @@ function setupEventListeners() {
         e.preventDefault();
         deferredPrompt = e;
         
-        // Only show prompt if not already installed
         if (!window.matchMedia('(display-mode: standalone)').matches) {
             setTimeout(() => {
-                document.getElementById('installPrompt').classList.remove('hidden');
+                const installPrompt = document.getElementById('installPrompt');
+                if (installPrompt) {
+                    installPrompt.classList.remove('hidden');
+                }
             }, 3000);
         }
     });
-
-    document.getElementById('installBtn').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log('User response to install prompt:', outcome);
-            deferredPrompt = null;
-            document.getElementById('installPrompt').classList.add('hidden');
-            
-            if (outcome === 'accepted') {
-                showNotification('App installed successfully!', 'success');
-            }
-        }
-    });
-
-    document.getElementById('dismissInstallBtn').addEventListener('click', () => {
-        document.getElementById('installPrompt').classList.add('hidden');
-        localStorage.setItem('pwaPromptDismissed', 'true');
-    });
-
-    // Check if already dismissed
-    if (localStorage.getItem('pwaPromptDismissed') === 'true') {
-        document.getElementById('installPrompt').classList.add('hidden');
-    }
+    
+    updateNetworkStatus();
 }
 
 // ==================== INITIALIZE APP ====================
@@ -1581,34 +1681,22 @@ function initializeApp() {
     // Setup event listeners
     setupEventListeners();
     
-    // Setup service worker for PWA
-    setupServiceWorker();
-    
     console.log('App initialized successfully');
 }
 
-function setupServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        const basePath = window.location.pathname.includes('attendance-system') 
-            ? '/attendance-system/' 
-            : '/';
-        
-        navigator.serviceWorker.register(basePath + 'service-worker.js')
-        .then(registration => {
-            console.log('Service Worker registered:', registration.scope);
-        })
-        .catch(error => {
-            console.log('Service Worker registration failed:', error);
-        });
-    }
-}
-
-// ==================== START APP ====================
-// Initialize app when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Auto login check is done in HTML script tag
-    // Now initialize the rest of the app
-    initializeApp();
-});
+// ==================== GLOBAL FUNCTIONS (for onclick attributes) ====================
+// এই ফাংশনগুলো global scope-এ রাখা হচ্ছে যাতে HTML-এর onclick attributes কাজ করে
+window.markAttendance = markAttendance;
+window.undoLastAttendance = undoLastAttendance;
+window.hideQuickCorrection = hideQuickCorrection;
+window.correctStudentAttendance = correctStudentAttendance;
+window.openCourse = openCourse;
+window.deleteCourse = deleteCourse;
+window.showAddCourseModal = showAddCourseModal;
+window.shareViaEmail = shareViaEmail;
+window.shareViaWhatsApp = shareViaWhatsApp;
+window.copyToClipboard = copyToClipboard;
+window.hideShareOptions = hideShareOptions;
+window.checkAutoLogin = checkAutoLogin;
+window.initializeApp = initializeApp;
+window.setupEssentialListeners = setupEssentialListeners;
