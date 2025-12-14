@@ -4,6 +4,44 @@
 // Version: 2.0
 
 // ==================== APP CONFIGURATION ====================
+/* ================= LOGIN SYSTEM ================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("loginForm");
+
+    if (loginForm) {
+        loginForm.addEventListener("submit", handleLogin);
+    }
+});
+
+function handleLogin(event) {
+    event.preventDefault(); // VERY IMPORTANT
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const teacherName = document.getElementById("teacherName").value.trim();
+
+    // Demo credentials
+    if (username === "teacher" && password === "philosophy123") {
+
+        // Save login
+        localStorage.setItem("attendanceUser", JSON.stringify({
+            username,
+            teacherName
+        }));
+
+        document.getElementById("currentUser").innerText = teacherName;
+        document.getElementById("attendanceUser").innerText = teacherName;
+
+        // Switch screen
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("dashboardScreen").classList.remove("hidden");
+
+    } else {
+        alert("Invalid username or password");
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     bindButtons();
 });
