@@ -805,6 +805,12 @@ function renderAttendanceTable() {
     const body = document.getElementById('attendanceTableBody');
     
     if (!header || !body) return;
+
+    document.getElementById("attendanceCourseInfo").innerText =
+    currentCourse.year === "MA"
+    ? `MA | Group ${currentCourse.group}`
+    : currentCourse.year;
+
     
     // Clear existing
     header.innerHTML = '';
