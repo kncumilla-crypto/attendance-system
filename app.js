@@ -87,6 +87,9 @@ function createCourse() {
 
     course.group = group;
 }
+course.group = course.year === "MA"
+    ? document.getElementById("maGroup").value
+    : null;
 
 
 const SECURITY_CONFIG = {
