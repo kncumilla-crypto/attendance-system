@@ -1806,6 +1806,18 @@ function setupEventListeners() {
                 e.target.value = '';
                 return;
             }
+
+            function handleCSVImport(file, course) {
+    const group = document.getElementById("maGroup").value;
+
+    if (course.year === "MA" && !group) {
+        alert("MA course-এর জন্য Group (A/B/C/D) সিলেক্ট করতে হবে");
+        return;
+    }
+
+    // Continue CSV reading...
+}
+
             
             if (file) {
                 importStudentsFromCSV(file, courseId);
