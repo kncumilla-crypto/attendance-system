@@ -1831,11 +1831,15 @@ function bindButtons() {
 }
 
 // ==================== INITIALIZE APP ====================
+// ==================== INITIALIZE APP ====================
 function initializeApp() {
     console.log('Initializing app...');
     
-    // Setup essential listeners first
+    // Setup essential listeners first (always needed)
     setupEssentialListeners();
+    
+    // Setup event listeners for ALL screens
+    setupEventListeners();
     
     // Check auto-login
     const isLoggedIn = checkAutoLogin();
@@ -1847,23 +1851,14 @@ function initializeApp() {
             loginScreen.classList.remove('hidden');
         }
         
-        // Setup login form listeners
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
-        }
-        
+        // Login form listeners are already setup in setupEventListeners()
+        // But ensure password toggle is working
         const togglePassword = document.getElementById('togglePassword');
         if (togglePassword) {
             togglePassword.addEventListener('click', togglePasswordVisibility);
         }
     }
     
-    // Setup other event listeners
-    setupEventListeners();
-    
     console.log('App initialized successfully');
-}
-
-// Initialize app when DOM is loaded
+}// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeApp);
