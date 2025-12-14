@@ -1,39 +1,36 @@
-// Service Worker for Attendance System PWA
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open('attendance-v1').then(function(cache) {
-            return cache.addAll([
-                './',
-                './index.html',
-                './manifest.json'
-                // অন্য ফাইলগুলো যোগ করুন
-            ]);
-        })
-    );
-});
-const CACHE_NAME = 'attendance-system-v2.0';
+// Service Worker for Attendance System - FIXED FOR GITHUB PAGES
+const CACHE_NAME = 'attendance-system-v4';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  'icon-192.png',
-  'icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
 ];
 
-// Install event
+// Install event - SIMPLIFIED
 self.addEventListener('install', event => {
   console.log('Service Worker: Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching files');
-        return cache.addAll(urlsToCache);
+        console.log('Service Worker: Caching app shell');
+        // Don't fail if some files can't be cached
+        return Promise.all(
+          urlsToCache.map(url => {
+            return cache.add(url).catch(err => {
+              console.log(`Failed to cache ${url}:`, err);
+              return Promise.resolve(); // Continue even if one fails
+            });
+          })
+        );
       })
       .then(() => {
-        console.log('Service Worker: Installed');
+        console.log('Service Worker: Install completed');
         return self.skipWaiting();
+      })
+      .catch(err => {
+        console.log('Service Worker: Install failed:', err);
       })
   );
 });
@@ -41,70 +38,62 @@ self.addEventListener('install', event => {
 // Activate event
 self.addEventListener('activate', event => {
   console.log('Service Worker: Activated');
-  // Remove old caches
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Clearing old cache');
-            return caches.delete(cache);
-          }
-        })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    Promise.all([
+      // Claim clients immediately
+      self.clients.claim(),
+      
+      // Clean up old caches
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cache => {
+            if (cache !== CACHE_NAME) {
+              console.log('Deleting old cache:', cache);
+              return caches.delete(cache);
+            }
+          })
+        );
+      })
+    ])
   );
 });
 
-// Fetch event
+// Fetch event - BASIC VERSION
 self.addEventListener('fetch', event => {
-  // Skip non-GET requests
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
   
-  // Skip chrome-extension requests
+  // Skip Chrome extensions
   if (event.request.url.startsWith('chrome-extension://')) return;
-  
-  console.log('Service Worker: Fetching', event.request.url);
   
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        // Return cached version
-        if (response) {
+      .then(cachedResponse => {
+        // Return cached if available
+        if (cachedResponse) {
           console.log('Serving from cache:', event.request.url);
-          return response;
+          return cachedResponse;
         }
         
-        // Clone the request
-        const fetchRequest = event.request.clone();
-        
-        // Fetch from network
-        return fetch(fetchRequest)
-          .then(response => {
-            // Check if valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+        // Otherwise fetch from network
+        return fetch(event.request)
+          .then(networkResponse => {
+            // Only cache successful responses
+            if (networkResponse && networkResponse.status === 200) {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseClone);
+                });
             }
-            
-            // Clone the response
-            const responseToCache = response.clone();
-            
-            // Cache the new response
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            
-            return response;
+            return networkResponse;
           })
           .catch(() => {
-            // If offline and not in cache, return offline page
+            // If fetch fails and it's an HTML request, return index.html
             if (event.request.headers.get('accept').includes('text/html')) {
               return caches.match('./index.html');
             }
-            return new Response('Offline - No internet connection', {
+            return new Response('You are offline', {
               status: 503,
               statusText: 'Service Unavailable'
             });
@@ -113,125 +102,9 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Background sync for offline data
+// Background sync (optional)
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-attendance') {
     console.log('Background sync started');
-    event.waitUntil(syncAttendanceData());
   }
 });
-
-async function syncAttendanceData() {
-  try {
-    // Get pending data from IndexedDB
-    const pendingData = await getPendingData();
-    
-    if (pendingData.length > 0) {
-      console.log('Syncing', pendingData.length, 'items');
-      
-      // Here you would sync with your server
-      // For demo, we'll just clear the pending data
-      await clearPendingData();
-      
-      // Send notification
-      self.registration.showNotification('Attendance System', {
-        body: 'Data synced successfully',
-        icon: 'icon-192.png'
-      });
-    }
-  } catch (error) {
-    console.error('Sync failed:', error);
-  }
-}
-
-// IndexedDB functions
-async function getPendingData() {
-  // In a real app, you would get data from IndexedDB
-  // For now, return empty array
-  return [];
-}
-
-async function clearPendingData() {
-  // In a real app, clear data from IndexedDB
-  return Promise.resolve();
-}
-
-// Push notifications
-self.addEventListener('push', event => {
-  let data = {};
-  if (event.data) {
-    try {
-      data = event.data.json();
-    } catch (e) {
-      data = { title: 'Attendance System', body: event.data.text() };
-    }
-  }
-  
-  const options = {
-    body: data.body || 'Attendance system notification',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
-    vibrate: [100, 50, 100],
-    data: {
-      url: data.url || '/',
-      timestamp: Date.now()
-    },
-    actions: [
-      {
-        action: 'open',
-        title: 'Open App'
-      },
-      {
-        action: 'close',
-        title: 'Close'
-      }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'Attendance System', options)
-  );
-});
-
-self.addEventListener('notificationclick', event => {
-  console.log('Notification clicked:', event.action);
-  event.notification.close();
-
-  if (event.action === 'open') {
-    event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true })
-        .then(windowClients => {
-          // Check if app is already open
-          for (const client of windowClients) {
-            if (client.url === '/' && 'focus' in client) {
-              return client.focus();
-            }
-          }
-          // Open new window
-          if (clients.openWindow) {
-            return clients.openWindow(event.notification.data.url || '/');
-          }
-        })
-    );
-  }
-});
-
-// Periodically clean up old cache
-self.addEventListener('periodicsync', event => {
-  if (event.tag === 'cleanup-cache') {
-    event.waitUntil(cleanupOldCache());
-  }
-});
-
-async function cleanupOldCache() {
-  const cacheNames = await caches.keys();
-  const currentTime = Date.now();
-  
-  for (const cacheName of cacheNames) {
-    if (cacheName.startsWith('attendance-system-') && cacheName !== CACHE_NAME) {
-      await caches.delete(cacheName);
-      console.log('Deleted old cache:', cacheName);
-    }
-  }
-
-}
