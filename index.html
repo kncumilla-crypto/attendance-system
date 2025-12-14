@@ -759,6 +759,45 @@
     </div>
 
     <script>
+// Auto-check for existing session on page load
+function checkAutoLogin() {
+    try {
+        const session = localStorage.getItem('attendanceSession');
+        if (session) {
+            const sessionData = JSON.parse(session);
+            const now = new Date().getTime();
+            
+            if (sessionData.expires > now) {
+                console.log('Auto-login from session');
+                appState.isAuthenticated = true;
+                appState.currentUser = sessionData.username;
+                appState.teacherName = sessionData.teacherName;
+                
+                // Show dashboard immediately
+                const loginEl = document.getElementById('loginScreen');
+                const dashboardEl = document.getElementById('dashboardScreen');
+                
+                if (loginEl && dashboardEl) {
+                    loginEl.style.display = 'none';
+                    dashboardEl.style.display = 'block';
+                    
+                    // Load courses after a delay
+                    setTimeout(() => {
+                        if (typeof loadCourses === 'function') {
+                            loadCourses();
+                        }
+                    }, 300);
+                }
+            }
+        }
+    } catch (e) {
+        console.log('Auto-login error:', e);
+    }
+}
+
+// Call on page load
+window.addEventListener('load', checkAutoLogin);
+       
         // ==================== APP CONFIGURATION ====================
         const SECURITY_CONFIG = {
             users: [
@@ -2423,4 +2462,5 @@ University of Chittagong
 </body>
 
 </html>
+
 
