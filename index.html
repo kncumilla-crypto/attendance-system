@@ -995,65 +995,106 @@
 
         // ==================== LOGIN/LOGOUT ====================
         loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    e.preventDefault();
+    console.log('Login form submitted'); // Debug log
+    
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const teacherName = document.getElementById('teacherName').value.trim();
+    
+    // Validate
+    if (!username || !password || !teacherName) {
+        showNotification('Please fill all fields', 'error');
+        return;
+    }
+    
+    // Check credentials
+    const user = SECURITY_CONFIG.users.find(u => 
+        u.username === username && u.password === password
+    );
+    
+    if (user) {
+        console.log('✅ Login successful for:', username);
+        
+        // Update app state
+        appState.isAuthenticated = true;
+        appState.currentUser = username;
+        appState.teacherName = teacherName || user.name;
+        
+        // Save session to localStorage
+        const sessionData = {
+            username: username,
+            teacherName: appState.teacherName,
+            expires: new Date().getTime() + SECURITY_CONFIG.sessionTimeout,
+            version: SECURITY_CONFIG.dataVersion
+        };
+        localStorage.setItem('attendanceSession', JSON.stringify(sessionData));
+        localStorage.setItem('teacherName', appState.teacherName);
+        
+        // ========== FIX: SHOW DASHBOARD ==========
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        
+        if (loginScreen && dashboardScreen) {
+            // METHOD 1: Direct style manipulation (most reliable)
+            loginScreen.style.display = 'none';
+            loginScreen.style.visibility = 'hidden';
+            loginScreen.style.opacity = '0';
+            loginScreen.style.height = '0';
+            loginScreen.style.overflow = 'hidden';
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const teacherName = document.getElementById('teacherName').value.trim();
+            dashboardScreen.style.display = 'block';
+            dashboardScreen.style.visibility = 'visible';
+            dashboardScreen.style.opacity = '1';
+            dashboardScreen.style.position = 'relative';
+            dashboardScreen.style.zIndex = '1000';
             
-            if (!username || !password || !teacherName) {
-                showNotification('Please fill all fields', 'error');
-                return;
-            }
-
-            // For production, this should be server-side validation
-            const user = SECURITY_CONFIG.users.find(u => 
-                u.username === username && u.password === password
-            );
+            console.log('✅ Dashboard should be visible now');
             
-            if (user) {
-                appState.isAuthenticated = true;
-                appState.currentUser = username;
-                appState.teacherName = teacherName || user.name;
-                
-                // Save session
-                const sessionData = {
-                    username: username,
-                    teacherName: appState.teacherName,
-                    expires: new Date().getTime() + SECURITY_CONFIG.sessionTimeout,
-                    version: SECURITY_CONFIG.dataVersion
-                };
-                localStorage.setItem('attendanceSession', JSON.stringify(sessionData));
-                localStorage.setItem('teacherName', appState.teacherName);
-                
-                // Clear form (except teacher name for convenience)
-                loginForm.reset();
-                document.getElementById('teacherName').value = appState.teacherName;
-                
-                // Show dashboard
-                showDashboard();
-                loadCourses();
-                
-                // Vibrate on successful login
-                vibrate([100, 50, 100]);
-                showNotification('Login successful!', 'success');
-            } else {
-                showNotification('Invalid username or password', 'error');
-                vibrate([200, 100, 200]);
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            if (confirm('Are you sure you want to logout?')) {
-                appState.isAuthenticated = false;
-                localStorage.removeItem('attendanceSession');
-                loginScreen.style.display = 'block';
-                dashboardScreen.style.display = 'none';
-                attendanceScreen.style.display = 'none';
-                showNotification('Logged out successfully', 'info');
-            }
-        });
-
+            // Update UI elements
+            document.getElementById('currentUser').textContent = appState.teacherName;
+            document.getElementById('attendanceUser').textContent = appState.teacherName;
+            
+            // Load courses
+            setTimeout(function() {
+                if (typeof loadCourses === 'function') {
+                    loadCourses();
+                    console.log('Courses loaded');
+                } else {
+                    console.warn('loadCourses function not found');
+                    // Fallback: load manually
+                    const saved = localStorage.getItem('attendanceCourses');
+                    if (saved) {
+                        try {
+                            const data = JSON.parse(saved);
+                            appState.courses = data.courses || [];
+                            if (typeof renderCourses === 'function') {
+                                renderCourses();
+                            }
+                        } catch (e) {
+                            console.error('Failed to load courses:', e);
+                        }
+                    }
+                }
+            }, 100);
+        } else {
+            console.error('❌ Screen elements not found!');
+            console.log('loginScreen:', loginScreen);
+            console.log('dashboardScreen:', dashboardScreen);
+        }
+        // ========== END FIX ==========
+        
+        showNotification('Login successful! Welcome ' + appState.teacherName, 'success');
+        
+        // Clear form (optional)
+        // loginForm.reset();
+        // document.getElementById('teacherName').value = appState.teacherName;
+        
+    } else {
+        console.log('❌ Login failed for:', username);
+        showNotification('Invalid username or password', 'error');
+    }
+});
         // ==================== COURSE MANAGEMENT ====================
         function loadCourses() {
             const savedCourses = localStorage.getItem('attendanceCourses');
@@ -2382,3 +2423,4 @@ University of Chittagong
 </body>
 
 </html>
+
