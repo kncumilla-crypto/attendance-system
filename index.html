@@ -366,32 +366,37 @@
         </div>
     </div>
 
+    <!-- Inline script for initialization -->
     <script>
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('App starting...');
+            console.log('Attendance System - DOM Loaded');
             
             // Show welcome screen for 1 second
-            document.getElementById('welcomeAd').classList.remove('hidden');
+            const welcomeAd = document.getElementById('welcomeAd');
+            if (welcomeAd) {
+                welcomeAd.classList.remove('hidden');
+            }
             
             setTimeout(() => {
-                document.getElementById('welcomeAd').classList.add('hidden');
+                if (welcomeAd) {
+                    welcomeAd.classList.add('hidden');
+                }
                 
-                // Check auto login
-                const isAutoLoggedIn = checkAutoLogin();
-                
-                if (!isAutoLoggedIn) {
-                    // Show login screen
-                    document.getElementById('loginScreen').classList.remove('hidden');
-                    // Initialize app for login screen
-                    setTimeout(initializeApp, 100);
-                } else {
-                    // Auto-login successful, setup essential listeners only
-                    setupEssentialListeners();
+                // Check auto login after welcome screen
+                if (typeof checkAutoLogin === 'function') {
+                    const isAutoLoggedIn = checkAutoLogin();
+                    
+                    if (!isAutoLoggedIn) {
+                        // Show login screen
+                        const loginScreen = document.getElementById('loginScreen');
+                        if (loginScreen) {
+                            loginScreen.classList.remove('hidden');
+                        }
+                    }
                 }
             }, 1000);
         });
     </script>
 </body>
 </html>
-
