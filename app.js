@@ -4,6 +4,25 @@
 // Version: 2.0
 
 // ==================== APP CONFIGURATION ====================
+document.addEventListener("DOMContentLoaded", () => {
+    bindButtons();
+});
+
+function bindButtons() {
+    const ids = [
+        "exportExcelBtn",
+        "printSheetBtn",
+        "shareAttendanceBtn",
+        "attendanceStartBtn"
+    ];
+
+    ids.forEach(id => {
+        if (!document.getElementById(id)) {
+            console.warn(id + " not found");
+        }
+    });
+}
+
 const SECURITY_CONFIG = {
     users: [
         {
