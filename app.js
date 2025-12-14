@@ -1739,6 +1739,40 @@ function setupEventListeners() {
     
     console.log('All event listeners setup complete');
 }
+document.getElementById("exportExcelBtn").addEventListener("click", generateExcel);
+
+function generateExcel() {
+    try {
+        if (!currentAttendance || currentAttendance.length === 0) {
+            alert("No attendance data found");
+            return;
+        }
+
+        const wsData = [];
+        wsData.push(["Student ID", "Name", "Status"]);
+
+        currentAttendance.forEach(s => {
+            wsData.push([
+                s.id,
+                s.name,
+                s.status === "P" ? "Present" : "Absent"
+            ]);
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+
+        const fileName =
+            `${currentCourse.code}-${currentCourse.year}-${currentDate}.xlsx`;
+
+        XLSX.writeFile(wb, fileName);
+
+    } catch (err) {
+        alert("Excel generation failed!");
+        console.error(err);
+    }
+}
 
 // ==================== ESSENTIAL LISTENERS ====================
 function setupEssentialListeners() {
