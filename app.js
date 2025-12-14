@@ -1529,7 +1529,16 @@ async function importStudentsFromCSV(file, courseId) {
                 errorCount++;
             }
         }
-        
+students.push({
+    id: student_id,
+    name: student_name,
+    year: year,
+    department: department,
+    group: course.year === "MA" ? group : null
+});
+
+
+                    
         if (importedCount > 0) {
             // Merge with existing students
             course.students = [...course.students, ...students];
