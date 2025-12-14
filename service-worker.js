@@ -1,5 +1,5 @@
 // attendance-system/service-worker.js
-const CACHE_NAME = 'attendance-system-v1';
+const CACHE_NAME = 'attendance-system-v2';
 const urlsToCache = [
   '/attendance-system/',
   '/attendance-system/index.html',
@@ -15,24 +15,10 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Service Worker: Opened cache');
         return cache.addAll(urlsToCache);
       })
-  );
-});
-
-// Fetch event
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -48,6 +34,47 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Fetch event
+self.addEventListener('fetch', event => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        
+        // Clone the request
+        const fetchRequest = event.request.clone();
+        
+        return fetch(fetchRequest).then(response => {
+          // Check if we received a valid response
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          // Clone the response
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          
+          return response;
+        }).catch(() => {
+          // If both cache and network fail, show offline page
+          if (event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/attendance-system/index.html');
+          }
+        });
+      })
   );
 });
