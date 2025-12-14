@@ -27,7 +27,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- Custom JS (defer ব্যবহার করছি যাতে HTML লোড হওয়ার পর JS লোড হয়) -->
+    <!-- Custom JS -->
     <script src="app.js" defer></script>
 </head>
 <body>
@@ -56,7 +56,7 @@
     </div>
     
     <!-- Login Screen -->
-    <div id="loginScreen">
+    <div id="loginScreen" class="hidden">
         <div class="login-header">
             <h1>Attendance System</h1>
             <p>Department of Philosophy</p>
@@ -287,16 +287,16 @@
         <div id="shareOptions" class="share-options hidden">
             <h3><i class="fas fa-share-alt"></i> Share Attendance</h3>
             <div class="share-buttons">
-                <button onclick="shareViaEmail()" class="btn btn-email">
+                <button id="shareEmailBtn" class="btn btn-email">
                     <i class="fas fa-envelope"></i> Email
                 </button>
-                <button onclick="shareViaWhatsApp()" class="btn btn-whatsapp">
+                <button id="shareWhatsappBtn" class="btn btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </button>
-                <button onclick="copyToClipboard()" class="btn btn-primary">
+                <button id="copyLinkBtn" class="btn btn-primary">
                     <i class="fas fa-copy"></i> Copy Link
                 </button>
-                <button onclick="hideShareOptions()" class="btn btn-secondary">
+                <button id="closeShareBtn" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Close
                 </button>
             </div>
@@ -313,10 +313,10 @@
             </div>
             
             <div class="attendance-options">
-                <button class="attendance-option-btn present-btn" onclick="markAttendance('present')">
+                <button id="presentBtn" class="attendance-option-btn present-btn">
                     <i class="fas fa-check-circle"></i> Present ✓
                 </button>
-                <button class="attendance-option-btn absent-btn" onclick="markAttendance('absent')">
+                <button id="absentBtn" class="attendance-option-btn absent-btn">
                     <i class="fas fa-times-circle"></i> Absent ✗
                 </button>
             </div>
@@ -343,10 +343,10 @@
     <div id="quickCorrection" class="quick-correction hidden">
         <i class="fas fa-history"></i>
         <span id="quickCorrectionText">Last marked: Student ID - Present</span>
-        <button onclick="undoLastAttendance()" class="btn btn-undo">
+        <button id="undoBtn" class="btn btn-undo">
             <i class="fas fa-undo"></i> Undo
         </button>
-        <button onclick="hideQuickCorrection()" class="btn btn-dismiss">
+        <button id="dismissQuickBtn" class="btn btn-dismiss">
             <i class="fas fa-times"></i> Dismiss
         </button>
     </div>
@@ -365,28 +365,29 @@
         </div>
     </div>
 
-    <!-- Notification Container (Dynamically Created) -->
-    
-    <!-- JavaScript -->
     <script>
-        // Initialize app
-        window.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing app...');
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App starting...');
             
-            // Show welcome screen
+            // Show welcome screen for 1 second
             document.getElementById('welcomeAd').classList.remove('hidden');
             
             setTimeout(() => {
                 document.getElementById('welcomeAd').classList.add('hidden');
                 
                 // Check auto login
-                if (!checkAutoLogin()) {
+                const isAutoLoggedIn = checkAutoLogin();
+                
+                if (!isAutoLoggedIn) {
                     // Show login screen
                     document.getElementById('loginScreen').classList.remove('hidden');
+                    // Initialize app for login screen
+                    setTimeout(initializeApp, 100);
+                } else {
+                    // Auto-login successful, setup essential listeners only
+                    setupEssentialListeners();
                 }
-                
-                // Initialize other components
-                initializeApp();
             }, 1000);
         });
     </script>
