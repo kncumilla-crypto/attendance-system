@@ -1,4 +1,16 @@
 // Service Worker for Attendance System PWA
+self.addEventListener('install', function(event) {
+    event.waitUntil(
+        caches.open('attendance-v1').then(function(cache) {
+            return cache.addAll([
+                './',
+                './index.html',
+                './manifest.json'
+                // অন্য ফাইলগুলো যোগ করুন
+            ]);
+        })
+    );
+});
 const CACHE_NAME = 'attendance-system-v2.0';
 const urlsToCache = [
   './',
@@ -221,4 +233,5 @@ async function cleanupOldCache() {
       console.log('Deleted old cache:', cacheName);
     }
   }
+
 }
