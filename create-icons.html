@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<body style="text-align: center; padding: 50px;">
+<h2>Create Icons for Attendance System</h2>
+
+<canvas id="canvas192" width="192" height="192" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+<canvas id="canvas512" width="512" height="512" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+<canvas id="canvas32" width="32" height="32" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+
+<div style="margin: 20px;">
+    <button onclick="createIcons()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Create & Download Icons
+    </button>
+</div>
+
+<script>
+function createIcons() {
+    const icons = [
+        { id: 'canvas192', name: 'icon-192.png', size: 192 },
+        { id: 'canvas512', name: 'icon-512.png', size: 512 },
+        { id: 'canvas32', name: 'favicon.ico', size: 32 }
+    ];
+    
+    icons.forEach(icon => {
+        const canvas = document.getElementById(icon.id);
+        const ctx = canvas.getContext('2d');
+        
+        // Blue background
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(0, 0, icon.size, icon.size);
+        
+        // White "A" letter
+        ctx.fillStyle = '#3498db';
+        ctx.font = `bold ${icon.size * 0.4}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('A', icon.size/2, icon.size/2);
+        
+        // Download
+        const link = document.createElement('a');
+        link.download = icon.name;
+        if (icon.name === 'favicon.ico') {
+            // For favicon, we need to create proper .ico
+            // For now, create a PNG and rename
+            link.download = 'favicon.png';
+            link.href = canvas.toDataURL('image/png');
+            alert('Download favicon.png and rename to favicon.ico');
+        } else {
+            link.href = canvas.toDataURL('image/png');
+        }
+        link.click();
+    });
+    
+    alert('Icons created! Upload to GitHub repository.');
+}
+
+// Auto-create on load
+window.onload = createIcons;
+</script>
+</body>
+</html>
