@@ -22,6 +22,34 @@ function bindButtons() {
         }
     });
 }
+function generateCSV() {
+    let csv = "ID,Name,Status\n";
+    currentAttendance.forEach(s => {
+        csv += `${s.id},${s.name},${s.status}\n`;
+    });
+    return encodeURIComponent(csv);
+}
+document.getElementById("shareEmailBtn").onclick = () => {
+    const csv = generateCSV();
+    window.location.href =
+        `mailto:?subject=Attendance&body=CSV Data:%0A${csv}`;
+};
+
+document.getElementById("shareWhatsappBtn").onclick = () => {
+    const text = encodeURIComponent("Attendance CSV attached");
+    window.open(`https://wa.me/?text=${text}`);
+};
+function createCourse() {
+    const group = document.getElementById("maGroup").value;
+
+    if (currentCourse.year === "MA" && !group) {
+        alert("Please select MA Group");
+        return;
+    }
+
+    course.group = group;
+}
+
 
 const SECURITY_CONFIG = {
     users: [
