@@ -76,6 +76,14 @@ body {
     font-size: 0.9rem;
 }
 
+/* CU Logo */
+.cu-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+
 /* Login Screen */
 #loginScreen {
     min-height: 100vh;
@@ -90,26 +98,6 @@ body {
     text-align: center;
     margin-bottom: 2rem;
     color: white;
-}
-
-.cu-logo-container {
-    margin-bottom: 1rem;
-}
-
-.cu-logo-placeholder {
-    width: 80px;
-    height: 80px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-}
-
-.cu-logo-placeholder i {
-    font-size: 2rem;
-    color: #2c3e50;
 }
 
 .login-header h2 {
@@ -135,6 +123,7 @@ body {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 400px;
+    margin-top: 1rem;
 }
 
 .form-group {
@@ -182,6 +171,7 @@ body {
     border: none;
     color: #7f8c8d;
     cursor: pointer;
+    z-index: 2;
 }
 
 .password-reset-section {
@@ -196,6 +186,23 @@ body {
 }
 
 .password-reset-section a:hover {
+    text-decoration: underline;
+}
+
+.switch-form {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.switch-form a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.switch-form a:hover {
     text-decoration: underline;
 }
 
@@ -217,16 +224,22 @@ body {
     background: #2ecc71;
     color: white;
     width: 100%;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .btn-login:hover {
     background: #27ae60;
 }
 
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
 .developer-info {
     text-align: center;
     padding-top: 1.5rem;
+    margin-top: 1.5rem;
     border-top: 1px solid #eee;
     color: #5d6d7e;
     font-size: 0.9rem;
@@ -234,6 +247,33 @@ body {
 
 .developer-info strong {
     color: #2c3e50;
+}
+
+/* Network Status Indicator */
+#netStatus {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 20px;
+    z-index: 1002;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#netDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: gray;
+}
+
+#netText {
+    font-weight: 500;
 }
 
 /* Modal */
@@ -357,17 +397,31 @@ body {
 
 .dashboard-controls {
     margin-bottom: 2rem;
+    text-align: center;
 }
 
-.dashboard-controls h2 {
+#dashTitle {
     color: white;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 2rem;
 }
 
-.dashboard-buttons {
+.quote-box {
+    color: white;
+    font-style: italic;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+#dashButtons {
     display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 260px;
+    margin: 0 auto;
 }
 
 .btn-primary {
@@ -412,6 +466,35 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Year Management */
+.year-management {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.year-controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.year-controls input {
+    flex: 1;
+    min-width: 150px;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
 }
 
 /* Live Courses */
@@ -487,6 +570,14 @@ body {
     font-size: 3rem;
     margin-bottom: 1rem;
     color: #bdc3c7;
+}
+
+/* Manual Student Add */
+.manual-add-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 /* Search Module */
@@ -567,15 +658,6 @@ body {
     cursor: pointer;
 }
 
-.btn-danger {
-    background: #e74c3c;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #c0392b;
-}
-
 .file-format {
     color: #7f8c8d;
     font-size: 0.9rem;
@@ -586,12 +668,13 @@ body {
     display: flex;
     gap: 1rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /* Share Options */
 .share-buttons {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-top: 1.5rem;
 }
@@ -601,9 +684,17 @@ body {
     color: white;
 }
 
+.btn-email:hover {
+    background: #2980b9;
+}
+
 .btn-whatsapp {
     background: #25D366;
     color: white;
+}
+
+.btn-whatsapp:hover {
+    background: #1da851;
 }
 
 .btn-messenger {
@@ -611,35 +702,15 @@ body {
     color: white;
 }
 
-/* Network Indicator */
-.network-indicator {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1002;
+.btn-messenger:hover {
+    background: #0055cc;
 }
 
-.online-indicator,
-.offline-indicator {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+/* Summary Buttons */
+.summary-buttons {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    animation: slideIn 0.3s ease;
-}
-
-.online-indicator {
-    background: #d5f4e6;
-    color: #27ae60;
-    border: 1px solid #27ae60;
-}
-
-.offline-indicator {
-    background: #fadbd8;
-    color: #e74c3c;
-    border: 1px solid #e74c3c;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 /* Notifications */
@@ -745,12 +816,21 @@ body {
     }
     
     .share-buttons {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .modal-content {
         width: 95%;
         padding: 1rem;
+    }
+    
+    .year-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .manual-add-form {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -769,5 +849,10 @@ body {
     
     .import-section {
         flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .share-buttons {
+        grid-template-columns: 1fr;
     }
 }
