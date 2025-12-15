@@ -29,6 +29,7 @@
     
     <!-- Custom JS -->
     <script src="app.js" defer></script>
+    <script src="https://unpkg.com/crypto-js@4.1.1/crypto-js.js"></script>
 </head>
 <body>
     <!-- Network Status Indicator -->
@@ -42,15 +43,15 @@
     </div>
     
     <!-- Welcome Screen -->
-    <div id="welcomeAd" class="welcome-screen hidden">
+    <div id="welcomeScreen" class="welcome-screen">
         <div class="welcome-overlay">
             <div class="welcome-content">
                 <i class="fas fa-graduation-cap welcome-icon"></i>
                 <h2>Welcome to Attendance System</h2>
                 <p>Department of Philosophy</p>
                 <p>University of Chittagong</p>
-                <p>Developed by. Md Imam Hossain</p>
-                <div class="welcome-number">1</div>
+                <p class="developer-credit">Developed by. Md. Imam Hossain</p>
+                <div class="welcome-number">3</div>
                 <p class="welcome-loading">Loading system...</p>
             </div>
         </div>
@@ -59,20 +60,23 @@
     <!-- Login Screen -->
     <div id="loginScreen" class="hidden">
         <div class="login-header">
-            <h1>Attendance System</h1>
-            <p>Department of Philosophy</p>
+            <div class="cu-logo-container">
+                <!-- Add your CU logo here -->
+                <div class="cu-logo-placeholder">
+                    <i class="fas fa-university"></i>
+                </div>
+            </div>
+            <h2>Attendance System</h2>
+            <h3>Department of Philosophy</h3>
+            <h4>University of Chittagong</h4>
         </div>
         
         <div class="login-body">
-            <div class="login-icon-section">
-                <i class="fas fa-user-shield login-icon"></i>
-                <h2>Teacher Login</h2>
-                <p>Enter credentials to access the system</p>
-            </div>
-            
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
                     <input type="text" id="username" placeholder="Your username" required>
                 </div>
                 
@@ -84,7 +88,9 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
                     <div class="password-input">
                         <input type="password" id="password" placeholder="Your password" required>
                         <button type="button" id="togglePassword" class="password-toggle">
@@ -93,16 +99,46 @@
                     </div>
                 </div>
                 
+                <div class="password-reset-section">
+                    <a href="#" id="resetPasswordLink">Forgot/Reset Password?</a>
+                </div>
+                
                 <button type="submit" class="btn btn-login">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
-<div class="demo-credentials">
-                    <p><strong>Demo Access:</strong><br>Username: <code>teacher</code><br>Password: <code>philosophy123</code></p>
-                    <p class="demo-warning">Change these credentials for production use</p>
+                
+                <div class="developer-info">
+                    <p><strong>Developed by. Md. Imam Hossain</strong></p>
+                    <p>Department of Philosophy, University of Chittagong</p>
+                    <p>Email: hbdctg@gmail.com</p>
+                    <p>WhatsApp: 01815643159</p>
                 </div>
             </form>
         </div>
-    </div>                
+        
+        <!-- Password Reset Modal -->
+        <div id="passwordResetModal" class="modal hidden">
+            <div class="modal-content">
+                <h3><i class="fas fa-key"></i> Reset Password</h3>
+                <div class="form-group">
+                    <label for="resetUsername">Username</label>
+                    <input type="text" id="resetUsername" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+                <div class="modal-buttons">
+                    <button id="confirmResetBtn" class="btn btn-success">Reset Password</button>
+                    <button id="cancelResetBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Main Dashboard -->
     <div id="dashboardScreen" class="hidden">
@@ -110,50 +146,148 @@
             <div class="header-content">
                 <h1>Attendance System</h1>
                 <p>Department of Philosophy</p>
+                <p>University of Chittagong</p>
             </div>
-            <div class="user-info">
+            <div class="user-bar">
                 <i class="fas fa-user-circle"></i>
-                <span id="currentUser">Teacher</span>
+                <span id="teacherNameDisplay"></span>
                 <button id="logoutBtn" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </div>
-
-
         
         <div class="dashboard-body">
             <div class="dashboard-controls">
-                <h2>Course List</h2>
+                <h2>Dashboard</h2>
                 
-                <div class="control-buttons">
-                    <button id="addCourseBtn" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> New Course
+                <div class="dashboard-buttons">
+                    <button id="btnAttendance" class="btn btn-primary">
+                        <i class="fas fa-clipboard-check"></i> Attendance
                     </button>
-                    <select id="maGroup">
-                    <option value="">Select Group</option>
-                    <option value="A">Group A</option>
-                    <option value="B">Group B</option>
-                    <option value="C">Group C</option>
-                    <option value="D">Group D</option>
-                    </select>
-            
-                    <button id="searchCorrectionBtn" class="btn btn-warning">
+                    <button id="btnSearch" class="btn btn-warning">
                         <i class="fas fa-search"></i> Search & Correct
                     </button>
-                    
-                    <button id="dataManagementBtn" class="btn btn-info">
+                    <button id="btnData" class="btn btn-info">
                         <i class="fas fa-database"></i> Data Management
                     </button>
                 </div>
             </div>
             
-            <div id="coursesGrid" class="courses-grid">
-                <!-- Courses will be loaded here -->
+            <!-- Attendance Module -->
+            <div id="attendanceModule" class="module-container hidden">
+                <h3><i class="fas fa-clipboard-check"></i> Attendance Module</h3>
+                
+                <div class="live-courses-section">
+                    <h4>Live Courses</h4>
+                    <div id="liveCourses" class="courses-list">
+                        <!-- Live courses will be loaded here -->
+                    </div>
+                    <button id="btnNewCourse" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Create New Course
+                    </button>
+                </div>
+                
+                <!-- New Course Creation Modal -->
+                <div id="newCourseModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h3><i class="fas fa-book"></i> Create New Course</h3>
+                        <div class="form-group">
+                            <label for="courseCode">Course Code</label>
+                            <input type="text" id="courseCode" placeholder="e.g., PHIL101" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseName">Course Name</label>
+                            <input type="text" id="courseName" placeholder="e.g., Introduction to Philosophy" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseYear">Year</label>
+                            <select id="courseYear" required>
+                                <option value="">Select Year</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                                <option value="M.A.">M.A.</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="groupSection">
+                            <label for="courseGroup">Group (Required for M.A.)</label>
+                            <select id="courseGroup">
+                                <option value="">Select Group</option>
+                                <option value="A">Group A</option>
+                                <option value="B">Group B</option>
+                                <option value="C">Group C</option>
+                                <option value="D">Group D</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseTeacher">Teacher</label>
+                            <input type="text" id="courseTeacher" value="" readonly>
+                        </div>
+                        <div class="modal-buttons">
+                            <button id="saveCourseBtn" class="btn btn-primary">Create Course</button>
+                            <button id="cancelCourseBtn" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary Popup -->
+                <div id="summaryPopup" class="modal hidden">
+                    <div class="modal-content">
+                        <h3><i class="fas fa-file-excel"></i> Attendance Summary</h3>
+                        <p>Attendance summary sheet is ready for download and sharing.</p>
+                        <div class="summary-buttons">
+                            <button id="saveExcelBtn" class="btn btn-success">
+                                <i class="fas fa-download"></i> Save Excel
+                            </button>
+                            <button id="shareSummaryBtn" class="btn btn-warning">
+                                <i class="fas fa-share-alt"></i> Share
+                            </button>
+                            <button id="closeSummaryBtn" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Data Management Section -->
-            <div id="dataManagementSection" class="data-management hidden">
+            <!-- Search & Correct Module -->
+            <div id="searchModule" class="module-container hidden">
+                <h3><i class="fas fa-search"></i> Search & Correct</h3>
+                
+                <div class="correction-form">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="searchDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Course</label>
+                        <select id="searchCourse" required>
+                            <option value="">Select Course</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Student ID/Name</label>
+                        <input type="text" id="searchStudentId" placeholder="Enter Student ID or Name">
+                    </div>
+                    
+                    <div class="correction-buttons">
+                        <button id="searchAttendanceBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="search-results hidden">
+                    <!-- Search results will appear here -->
+                </div>
+            </div>
+            
+            <!-- Data Management Module -->
+            <div id="dataModule" class="module-container hidden">
                 <h3><i class="fas fa-database"></i> Data Management</h3>
                 
                 <div class="data-section">
@@ -190,110 +324,13 @@
                         </label>
                     </div>
                 </div>
-                
-                <div class="data-management-footer">
-                    <button id="closeDataManagementBtn" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Close
-                    </button>
-                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Search & Correction Section -->
-    <div id="correctionSection" class="correction-section hidden">
-        <h3><i class="fas fa-search"></i> Search & Correct Attendance</h3>
-        
-        <div class="correction-form">
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="searchDate" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Course</label>
-                <select id="searchCourse" required>
-                    <option value="">Select Course</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Student ID/Name</label>
-                <input type="text" id="searchStudentId" placeholder="Enter Student ID or Name">
-            </div>
-        </div>
-        
-        <div class="correction-buttons">
-            <button id="searchAttendanceBtn" class="btn btn-primary">
-                <i class="fas fa-search"></i> Search
-            </button>
-            <button id="closeCorrectionBtn" class="btn btn-secondary">
-                <i class="fas fa-times"></i> Close
-            </button>
-        </div>
-        
-        <div id="searchResults" class="search-results hidden">
-            <!-- Search results will appear here -->
-        </div>
-    </div>
-    
-    <!-- Attendance Page -->
-    <div id="attendanceScreen" class="hidden">
-        <div class="attendance-header">
-            <div class="attendance-header-content">
-                <div>
-                    <h1 id="attendanceCourseTitle">Course Attendance</h1>
-                    <p id="attendanceCourseInfo">Course details</p>
-                </div>
-                <div class="attendance-user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="attendanceUser">Teacher</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="attendance-subheader">
-            <div class="course-info">
-                <div class="course-title" id="currentCourseTitle"></div>
-                <div class="course-details" id="attendanceDatesInfo"></div>
-            </div>
-            
-            <div class="attendance-controls">
-                <button id="attendanceStartBtn" class="btn btn-start">
-                    <i class="fas fa-play-circle"></i> Start Attendance
-                </button>
-                <button id="shareAttendanceBtn" class="btn btn-warning">
-                    <i class="fas fa-share-alt"></i> Share
-                </button>
-            </div>
-        </div>
-        
-        <!-- Attendance Table Container -->
-        <div id="attendanceTableContainer" class="attendance-table-container hidden">
-            <table id="attendanceTable">
-                <thead id="attendanceTableHeader">
-                    <!-- Headers will be generated dynamically -->
-                </thead>
-                <tbody id="attendanceTableBody">
-                    <!-- Rows will be generated dynamically -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="attendance-footer">
-            <button id="backToDashboardBtn" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </button>
-            <button id="exportExcelBtn" class="btn btn-success hidden">
-                <i class="fas fa-file-excel"></i> Excel Sheet
-            </button>
-            <button id="printSheetBtn" class="btn btn-primary hidden">
-                <i class="fas fa-print"></i> Print
-            </button>
-        </div>
-        
-        <!-- Share Options -->
-        <div id="shareOptions" class="share-options hidden">
+
+    <!-- Share Options Popup -->
+    <div id="shareOptionsPopup" class="modal hidden">
+        <div class="modal-content">
             <h3><i class="fas fa-share-alt"></i> Share Attendance</h3>
             <div class="share-buttons">
                 <button id="shareEmailBtn" class="btn btn-email">
@@ -302,112 +339,28 @@
                 <button id="shareWhatsappBtn" class="btn btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </button>
-                <button id="copyLinkBtn" class="btn btn-primary">
-                    <i class="fas fa-copy"></i> Copy Link
+                <button id="shareMessengerBtn" class="btn btn-messenger">
+                    <i class="fab fa-facebook-messenger"></i> Messenger
                 </button>
-                <button id="closeShareBtn" class="btn btn-secondary">
+                <button id="closeSharePopupBtn" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
     </div>
-    
-    <!-- Attendance Popup -->
-    <div id="attendancePopupOverlay" class="attendance-popup-overlay hidden">
-        <div class="attendance-popup">
-            <div class="popup-student-info">
-                <div class="student-id" id="popupStudentId">1001</div>
-                <div class="student-name" id="popupStudentName">Student Name</div>
-                <div class="student-details" id="popupStudentDetails">1st Year | Philosophy</div>
-            </div>
-            
-            <div class="attendance-options">
-                <button id="presentBtn" class="attendance-option-btn present-btn">
-                    <i class="fas fa-check-circle"></i> Present ✓
-                </button>
-                <button id="absentBtn" class="attendance-option-btn absent-btn">
-                    <i class="fas fa-times-circle"></i> Absent ✗
-                </button>
-            </div>
-            
-            <div class="progress-section">
-                <div class="progress-info">
-                    <span id="currentProgress">0/0</span>
-                    <span id="progressPercentage">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-            </div>
-            
-            <div class="popup-footer">
-                <button id="stopAttendanceBtn" class="btn btn-stop">
-                    <i class="fas fa-stop-circle"></i> Stop Attendance
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Quick Correction -->
-    <div id="quickCorrection" class="quick-correction hidden">
-        <i class="fas fa-history"></i>
-        <span id="quickCorrectionText">Last marked: Student ID - Present</span>
-        <button id="undoBtn" class="btn btn-undo">
-            <i class="fas fa-undo"></i> Undo
-        </button>
-        <button id="dismissQuickBtn" class="btn btn-dismiss">
-            <i class="fas fa-times"></i> Dismiss
-        </button>
-    </div>
-    
-    <!-- PWA Install Prompt -->
-    <div id="installPrompt" class="install-prompt hidden">
-        <h3><i class="fas fa-download"></i> Install Attendance System</h3>
-        <p>Add to home screen for quick access</p>
-        <div class="install-buttons">
-            <button id="installBtn" class="btn btn-install">
-                <i class="fas fa-download"></i> Install
-            </button>
-            <button id="dismissInstallBtn" class="btn btn-dismiss-install">
-                <i class="fas fa-times"></i> Later
-            </button>
-        </div>
-    </div>
 
-    <!-- Inline script for initialization -->
     <script>
-        // Initialize app when DOM is loaded
+        // Welcome screen display for 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Attendance System - DOM Loaded');
-            
-            // Show welcome screen for 1 second
-            const welcomeAd = document.getElementById('welcomeAd');
-            if (welcomeAd) {
-                welcomeAd.classList.remove('hidden');
-            }
-            
             setTimeout(() => {
-                if (welcomeAd) {
-                    welcomeAd.classList.add('hidden');
-                }
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                const isAutoLoggedIn = checkAutoLogin();
                 
-                // Check auto login after welcome screen
-                if (typeof checkAutoLogin === 'function') {
-                    const isAutoLoggedIn = checkAutoLogin();
-                    
-                    if (!isAutoLoggedIn) {
-                        // Show login screen
-                        const loginScreen = document.getElementById('loginScreen');
-                        if (loginScreen) {
-                            loginScreen.classList.remove('hidden');
-                        }
-                    }
+                if (!isAutoLoggedIn) {
+                    document.getElementById('loginScreen').classList.remove('hidden');
                 }
-            }, 1000);
+            }, 3000);
         });
     </script>
 </body>
 </html>
-
-
-
