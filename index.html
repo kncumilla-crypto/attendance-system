@@ -33,13 +33,9 @@
 </head>
 <body>
     <!-- Network Status Indicator -->
-    <div class="network-indicator">
-        <div id="onlineIndicator" class="online-indicator">
-            <i class="fas fa-wifi"></i> Online
-        </div>
-        <div id="offlineIndicator" class="offline-indicator">
-            <i class="fas fa-wifi-slash"></i> Offline
-        </div>
+    <div id="netStatus" class="network-indicator">
+        <span id="netDot"></span>
+        <span id="netText"></span>
     </div>
     
     <!-- Welcome Screen -->
@@ -61,30 +57,80 @@
     <div id="loginScreen" class="hidden">
         <div class="login-header">
             <div class="cu-logo-container">
-                <!-- Add your CU logo here -->
-                <div class="cu-logo-placeholder">
-                    <i class="fas fa-university"></i>
-                </div>
+                <!-- CU Logo -->
+                <img src="images/cu_logo.png" alt="CU Logo" class="cu-logo">
             </div>
             <h2>Attendance System</h2>
             <h3>Department of Philosophy</h3>
             <h4>University of Chittagong</h4>
         </div>
         
-        <div class="login-body">
+        <!-- Registration Form (Initially Hidden) -->
+        <div id="registerBox" class="login-body hidden">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUser">
+                        <i class="fas fa-user"></i> User ID
+                    </label>
+                    <input type="text" id="regUser" placeholder="Create username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teacherNameReg">
+                        <i class="fas fa-user-tie"></i> Teacher Name
+                    </label>
+                    <input type="text" id="teacherNameReg" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPass">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="regPass" placeholder="Create password" required>
+                        <button type="button" id="toggleRegPass" class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPass2">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="regPass2" placeholder="Confirm password" required>
+                        <button type="button" id="toggleRegPass2" class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regHint">
+                        <i class="fas fa-lightbulb"></i> Password Hint
+                    </label>
+                    <input type="text" id="regHint" placeholder="Password reminder hint">
+                </div>
+                
+                <button type="submit" class="btn btn-login">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+                
+                <div class="switch-form">
+                    <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Login Form (Initially Visible) -->
+        <div id="loginBox" class="login-body">
             <form id="loginForm">
                 <div class="form-group">
                     <label for="username">
                         <i class="fas fa-user"></i> Username
                     </label>
                     <input type="text" id="username" placeholder="Your username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="teacherName">
-                        <i class="fas fa-user-tie"></i> Teacher Name
-                    </label>
-                    <input type="text" id="teacherName" placeholder="Enter your full name" required>
                 </div>
                 
                 <div class="form-group">
@@ -107,6 +153,10 @@
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
                 
+                <div class="switch-form">
+                    <p>New user? <a href="#" id="showRegister">Register</a></p>
+                </div>
+                
                 <div class="developer-info">
                     <p><strong>Developed by. Md. Imam Hossain</strong></p>
                     <p>Department of Philosophy, University of Chittagong</p>
@@ -126,11 +176,21 @@
                 </div>
                 <div class="form-group">
                     <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" placeholder="Enter new password">
+                    <div class="password-input">
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                        <button type="button" id="toggleNewPass" class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    <div class="password-input">
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                        <button type="button" id="toggleConfirmPass" class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="modal-buttons">
                     <button id="confirmResetBtn" class="btn btn-success">Reset Password</button>
@@ -159,9 +219,11 @@
         
         <div class="dashboard-body">
             <div class="dashboard-controls">
-                <h2>Dashboard</h2>
+                <h2 id="dashTitle">Dashboard</h2>
                 
-                <div class="dashboard-buttons">
+                <div id="quoteBox" class="quote-box"></div>
+                
+                <div id="dashButtons" class="dashboard-buttons">
                     <button id="btnAttendance" class="btn btn-primary">
                         <i class="fas fa-clipboard-check"></i> Attendance
                     </button>
@@ -177,6 +239,17 @@
             <!-- Attendance Module -->
             <div id="attendanceModule" class="module-container hidden">
                 <h3><i class="fas fa-clipboard-check"></i> Attendance Module</h3>
+                
+                <!-- Year Management -->
+                <div class="year-management">
+                    <h4>Year Management</h4>
+                    <div class="year-controls">
+                        <input type="text" id="newYear" placeholder="Add New Year (e.g., 2025)">
+                        <button id="addYearBtn" class="btn btn-sm">Add Year</button>
+                        <input type="text" id="delYear" placeholder="Year to Delete">
+                        <button id="delYearBtn" class="btn btn-sm btn-danger">Delete Year</button>
+                    </div>
+                </div>
                 
                 <div class="live-courses-section">
                     <h4>Live Courses</h4>
@@ -229,6 +302,26 @@
                             <button id="saveCourseBtn" class="btn btn-primary">Create Course</button>
                             <button id="cancelCourseBtn" class="btn btn-secondary">Cancel</button>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Manual Student Add Section -->
+                <div id="manualStudentAdd" class="data-section hidden">
+                    <h4>Add Student Manually</h4>
+                    <div class="manual-add-form">
+                        <div class="form-group">
+                            <label>Student Name</label>
+                            <input type="text" id="stuName" placeholder="Full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Roll Number</label>
+                            <input type="text" id="stuRoll" placeholder="Roll number">
+                        </div>
+                        <div class="form-group">
+                            <label>Registration No</label>
+                            <input type="text" id="stuReg" placeholder="Registration number">
+                        </div>
+                        <button id="addStuBtn" class="btn btn-success">Add Student</button>
                     </div>
                 </div>
                 
@@ -324,6 +417,32 @@
                         </label>
                     </div>
                 </div>
+                
+                <!-- Manual Student Add Section (Duplicate for Data Module) -->
+                <div class="data-section">
+                    <h4>Add Student Manually</h4>
+                    <div class="manual-add-form">
+                        <div class="form-group">
+                            <label>Select Course</label>
+                            <select id="manualCourseSelect">
+                                <option value="">Select Course</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Student Name</label>
+                            <input type="text" id="stuName2" placeholder="Full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Roll Number</label>
+                            <input type="text" id="stuRoll2" placeholder="Roll number">
+                        </div>
+                        <div class="form-group">
+                            <label>Registration No</label>
+                            <input type="text" id="stuReg2" placeholder="Registration number">
+                        </div>
+                        <button id="addStuBtn2" class="btn btn-success">Add Student</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -334,13 +453,13 @@
             <h3><i class="fas fa-share-alt"></i> Share Attendance</h3>
             <div class="share-buttons">
                 <button id="shareEmailBtn" class="btn btn-email">
-                    <i class="fas fa-envelope"></i> Email
+                    <i class="fas fa-envelope"></i>
                 </button>
                 <button id="shareWhatsappBtn" class="btn btn-whatsapp">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
+                    <i class="fab fa-whatsapp"></i>
                 </button>
                 <button id="shareMessengerBtn" class="btn btn-messenger">
-                    <i class="fab fa-facebook-messenger"></i> Messenger
+                    <i class="fab fa-facebook-messenger"></i>
                 </button>
                 <button id="closeSharePopupBtn" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Close
