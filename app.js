@@ -1019,7 +1019,7 @@ function exportAttendanceSummary() {
         
         data.push(['Total Students:', totalStudents]);
         data.push(['Present:', presentCount]);
-        data.push(['Absent:', absentCount);
+        data.push(['Absent:', absentCount]);
         data.push(['Percentage:', Math.round((presentCount / totalStudents) * 100) + '%']);
         
         // Create workbook
