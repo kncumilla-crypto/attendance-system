@@ -277,14 +277,38 @@ function startSessionRefresh() {
 }
 
 // ==================== SCREEN MANAGEMENT ====================
+
+// ১. ফাংশনটিকে গ্লোবাল করুন
 window.showDashboard = function() {
   const loginScreen = document.getElementById("loginScreen");
   const dashboardScreen = document.getElementById("dashboardScreen");
+  const welcomeScreen = document.getElementById("welcomeScreen"); // যদি থাকে
 
   if (loginScreen) loginScreen.classList.add("hidden");
+  if (welcomeScreen) welcomeScreen.classList.add("hidden");
+  
   if (dashboardScreen) {
     dashboardScreen.classList.remove("hidden");
+    
+    // নাম আপডেট
+    const teacherNameDisplay = document.getElementById("teacherNameDisplay");
+    if (teacherNameDisplay) {
+      teacherNameDisplay.textContent = appState.teacherName || "Teacher";
+    }
+    
+    // অন্যান্য প্রয়োজনীয় ফাংশন কল (যদি থাকে)
+    if (typeof showQuote === 'function') showQuote();
+  }
+};
 
+// ২. লগইন স্ক্রিন দেখানোর ফাংশন
+window.showLoginScreen = function() {
+  const loginScreen = document.getElementById("loginScreen");
+  const dashboardScreen = document.getElementById("dashboardScreen");
+  
+  if (dashboardScreen) dashboardScreen.classList.add("hidden");
+  if (loginScreen) loginScreen.classList.remove("hidden");
+};
     // Update teacher name display
     const teacherNameDisplay = document.getElementById("teacherNameDisplay");
     if (teacherNameDisplay) {
