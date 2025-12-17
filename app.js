@@ -955,33 +955,15 @@ function markStudent(status) {
     const student = attendanceState.studentList[attendanceState.currentIndex];
     const course = appState.currentCourse;
     const today = attendanceState.currentDate;
-    
- function markStudent(status) {
-    const student = attendanceState.studentList[attendanceState.currentIndex];
-    const course = appState.currentCourse;
-    const today = attendanceState.currentDate;
-    
-    // ছাত্রটি বিদ্যমান আছে কি না তা নিশ্চিত করা
-    if (student && course && course.attendance[today]) {
+   
+    if (course && course.attendance[today]) {
         course.attendance[today][student.id] = status;
         saveCourses();
-        
-        // ইনডেক্স বাড়ানো
-        attendanceState.currentIndex++;
-
-        // চেক করা হচ্ছে আরও ছাত্র আছে কি না
-        if (attendanceState.currentIndex < attendanceState.studentList.length) {
-            showNextStudentInPopup(); 
-        } else {
-            // যদি ছাত্র শেষ হয়ে যায়, তবে পপআপ বন্ধ করে সামারি দেখাবে
-            completeAttendance(); 
-        }
-    } else {
-        // যদি ছাত্র খুঁজে না পায় (এরর এড়াতে)
-        completeAttendance();
     }
+    
+    attendanceState.currentIndex++;
+    showNextStudentInPopup();
 }
-
 function completeAttendance() {
     // Remove popup
     const popup = document.querySelector('.modal');
