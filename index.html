@@ -7,21 +7,6 @@
     <meta name="description" content="University of Chittagong - Department of Philosophy Attendance System">
     
     <!-- PWA Configuration -->
-    <!-- Add this in the head section for PWA -->
-<script>
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-  
-  // Handle install prompt
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    // You can show an install button here
-  });
-</script>
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
     
@@ -38,13 +23,13 @@
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/crypto-js@4.1.1/crypto-js.js"></script>
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
     
     <!-- Custom JS -->
     <script src="app.js" defer></script>
-    <script src="https://unpkg.com/crypto-js@4.1.1/crypto-js.js"></script>
 </head>
 <body>
     <!-- Network Status Indicator -->
@@ -498,4 +483,3 @@
     </script>
 </body>
 </html>
-
