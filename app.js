@@ -166,7 +166,8 @@ const quotes = [
   "“Labor is the source of all wealth.” – Karl Marx",
   "“Work gives meaning to life.” – Tolstoy",
   "“Pleasure in the job puts perfection in the work.” – Aristotle",
-  "“Without labor nothing prospers." – Sophocles",
+  "“Without labor nothing prospers." - Sophocles",
+  "“তুমি কাজ করে যাও, মহাকালে গর্ভে তুমি হারাবেনা." - উইঘুর ইয়াকুব বেগ",
   "“Choose a job you love, and you will never have to work a day in your life.” – Confucius",
   "“The only way to do great work is to love what you do.” – Steve Jobs",
 ];
