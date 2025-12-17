@@ -7,6 +7,21 @@
     <meta name="description" content="University of Chittagong - Department of Philosophy Attendance System">
     
     <!-- PWA Configuration -->
+    <!-- Add this in the head section for PWA -->
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  
+  // Handle install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // You can show an install button here
+  });
+</script>
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
     
@@ -483,3 +498,4 @@
     </script>
 </body>
 </html>
+
