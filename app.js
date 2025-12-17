@@ -173,7 +173,6 @@ const quotes = [
   "Choose a job you love, and you will never have to work a day in your life. - Confucius",
   "The only way to do great work is to love what you do. - Steve Jobs",
 ];
-
 function showQuote() {
   const q = quotes[Math.floor(Math.random() * quotes.length)];
   const quoteBox = document.getElementById("quoteBox");
