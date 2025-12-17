@@ -856,3 +856,100 @@ body {
         grid-template-columns: 1fr;
     }
 }
+/* Add these to your existing style.css */
+
+/* Enhanced Student Card Buttons */
+.present-btn {
+  background: #2ecc71 !important;
+  color: white !important;
+}
+
+.absent-btn {
+  background: #e74c3c !important;
+  color: white !important;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.8rem !important;
+}
+
+/* Search Stats */
+.search-stats {
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #3498db;
+}
+
+.search-stats p {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Course Stats */
+.course-stats {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+}
+
+/* Attendance Actions */
+.attendance-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Keyboard Shortcut Hint */
+.keyboard-hint {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  text-align: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Progress Bar Enhanced */
+.progress-bar-container {
+  background: #ecf0f1;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .attendance-actions {
+    flex-direction: column;
+  }
+  
+  .student-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .student-card > div {
+    width: 100%;
+  }
+}
