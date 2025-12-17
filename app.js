@@ -166,12 +166,12 @@ function updateNetStatus() {
 
 // ==================== QUOTE SYSTEM ====================
 const quotes = [
-  "Labor is the source of all wealth. – Karl Marx",
-  "Work gives meaning to life. – Tolstoy",
-  "Pleasure in the job puts perfection in the work. – Aristotle",
-  "Without labor nothing prospers. – Sophocles",
-  "Choose a job you love, and you will never have to work a day in your life. – Confucius",
-  "The only way to do great work is to love what you do. – Steve Jobs",
+  "Labor is the source of all wealth. - Karl Marx",
+  "Work gives meaning to life. - Tolstoy",
+  "Pleasure in the job puts perfection in the work. - Aristotle",
+  "Without labor nothing prospers. - Sophocles",
+  "Choose a job you love, and you will never have to work a day in your life. - Confucius",
+  "The only way to do great work is to love what you do. - Steve Jobs",
 ];
 
 function showQuote() {
