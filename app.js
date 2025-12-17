@@ -237,7 +237,7 @@ function checkAutoLogin() {
     appState.currentUser = sessionData.username || "";
 
     // Show dashboard
-    showDashboard();
+    window.showDashboard();
 
     // Load courses
     setTimeout(() => {
@@ -277,7 +277,7 @@ function startSessionRefresh() {
 }
 
 // ==================== SCREEN MANAGEMENT ====================
-function showDashboard() {
+function window.showDashboard() {
   const loginScreen = document.getElementById("loginScreen");
   const dashboardScreen = document.getElementById("dashboardScreen");
 
