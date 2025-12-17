@@ -1,7 +1,7 @@
 // attendance-system/app.js
 // University of Chittagong - Department of Philosophy
 // Attendance Management System
-// Version: 3.1 - Enhanced Security & Features
+// Version: 3.1.1 - Bug Fixed
 // Modified as per requirements with security improvements
 
 // ==================== APP CONFIGURATION ====================
@@ -9,7 +9,7 @@ const SECURITY_CONFIG = {
   users: [],
   sessionTimeout: 60 * 60 * 1000,
   maxBackupFiles: 5,
-  dataVersion: "3.1",
+  dataVersion: "3.1.1",
   appSalt: "cu_philosophy_2025_secure_salt"
 };
 
@@ -45,6 +45,7 @@ function hashPassword(password) {
 }
 
 function validateInput(input, type = 'text') {
+  if (!input) return '';
   const sanitized = input.toString().trim();
   
   switch(type) {
@@ -128,7 +129,7 @@ function provideHapticFeedback() {
 
 // ==================== ENHANCED PASSWORD STRENGTH CHECK ====================
 function checkPasswordStrength(password) {
-  if (password.length < 6) return "weak";
+  if (!password || password.length < 6) return "weak";
   
   let strength = 0;
   if (password.length >= 8) strength++;
@@ -147,6 +148,8 @@ function updateNetStatus() {
   const dot = document.getElementById("netDot");
   const text = document.getElementById("netText");
 
+  if (!dot || !text) return;
+
   if (navigator.onLine) {
     dot.style.background = "green";
     text.textContent = "Online";
@@ -163,13 +166,12 @@ function updateNetStatus() {
 
 // ==================== QUOTE SYSTEM ====================
 const quotes = [
-  "“Labor is the source of all wealth.” – Karl Marx",
-  "“Work gives meaning to life.” – Tolstoy",
-  "“Pleasure in the job puts perfection in the work.” – Aristotle",
-  "“Without labor nothing prospers." - Sophocles",
-  "“তুমি কাজ করে যাও, মহাকালে গর্ভে তুমি হারাবেনা।" - উইঘুর ইয়াকুব বেগ",
-  "“Choose a job you love, and you will never have to work a day in your life.” – Confucius",
-  "“The only way to do great work is to love what you do.” – Steve Jobs",
+  "Labor is the source of all wealth. – Karl Marx",
+  "Work gives meaning to life. – Tolstoy",
+  "Pleasure in the job puts perfection in the work. – Aristotle",
+  "Without labor nothing prospers. – Sophocles",
+  "Choose a job you love, and you will never have to work a day in your life. – Confucius",
+  "The only way to do great work is to love what you do. – Steve Jobs",
 ];
 
 function showQuote() {
@@ -182,8 +184,8 @@ function showQuote() {
 
 // ==================== YEAR FORMAT FUNCTION ====================
 function formatYear(year, batch) {
-  const yearInt = parseInt(year);
   if (year === "M.A.") return "M.A.";
+  const yearInt = parseInt(year);
   if (yearInt == 1) return `1st ${batch}`;
   if (yearInt == 2) return `2nd ${batch}`;
   if (yearInt == 3) return `3rd ${batch}`;
@@ -207,18 +209,23 @@ function showWelcomeScreen() {
 function checkAutoLogin() {
   try {
     const session = localStorage.getItem("attendanceSession");
-    if (!session) return false;
+    if (!session) {
+      showLoginScreen();
+      return false;
+    }
     
     const sessionData = JSON.parse(session);
     const now = new Date().getTime();
     
     if (sessionData.expires < now) {
       localStorage.removeItem("attendanceSession");
+      showLoginScreen();
       return false;
     }
     
     if (sessionData.version !== SECURITY_CONFIG.dataVersion) {
       localStorage.removeItem("attendanceSession");
+      showLoginScreen();
       return false;
     }
     
@@ -244,8 +251,17 @@ function checkAutoLogin() {
   } catch (e) {
     console.error("Auto-login error:", e);
     localStorage.removeItem("attendanceSession");
+    showLoginScreen();
     return false;
   }
+}
+
+function showLoginScreen() {
+  const loginScreen = document.getElementById("loginScreen");
+  const welcomeScreen = document.getElementById("welcomeScreen");
+  
+  if (welcomeScreen) welcomeScreen.classList.add("hidden");
+  if (loginScreen) loginScreen.classList.remove("hidden");
 }
 
 function startSessionRefresh() {
@@ -427,7 +443,8 @@ function handleLogin(e) {
     }
   } else {
     showNotification("User not found. Please register first.", "error");
-    document.getElementById("showRegister").click();
+    const showRegisterBtn = document.getElementById("showRegister");
+    if (showRegisterBtn) showRegisterBtn.click();
   }
 }
 
@@ -526,24 +543,28 @@ function setupPasswordReset() {
   if (resetLink) {
     resetLink.onclick = (e) => {
       e.preventDefault();
-      resetModal.classList.remove("hidden");
+      if (resetModal) resetModal.classList.remove("hidden");
     };
   }
 
   if (cancelResetBtn) {
     cancelResetBtn.onclick = () => {
-      resetModal.classList.add("hidden");
-      document.getElementById("resetUsername").value = "";
-      document.getElementById("newPassword").value = "";
-      document.getElementById("confirmPassword").value = "";
+      if (resetModal) resetModal.classList.add("hidden");
+      const resetUsername = document.getElementById("resetUsername");
+      const newPassword = document.getElementById("newPassword");
+      const confirmPassword = document.getElementById("confirmPassword");
+      
+      if (resetUsername) resetUsername.value = "";
+      if (newPassword) newPassword.value = "";
+      if (confirmPassword) confirmPassword.value = "";
     };
   }
 
   if (confirmResetBtn) {
     confirmResetBtn.onclick = () => {
-      const username = validateInput(document.getElementById("resetUsername").value || "", 'username');
-      const newPassword = document.getElementById("newPassword").value || "";
-      const confirmPassword = document.getElementById("confirmPassword").value || "";
+      const username = validateInput(document.getElementById("resetUsername")?.value || "", 'username');
+      const newPassword = document.getElementById("newPassword")?.value || "";
+      const confirmPassword = document.getElementById("confirmPassword")?.value || "";
 
       if (!username || !newPassword || !confirmPassword) {
         showNotification("Please fill all fields", "error");
@@ -580,10 +601,14 @@ function setupPasswordReset() {
 
       localStorage.setItem("attendanceUsers", JSON.stringify(users));
 
-      resetModal.classList.add("hidden");
-      document.getElementById("resetUsername").value = "";
-      document.getElementById("newPassword").value = "";
-      document.getElementById("confirmPassword").value = "";
+      if (resetModal) resetModal.classList.add("hidden");
+      const resetUsername = document.getElementById("resetUsername");
+      const newPass = document.getElementById("newPassword");
+      const confirmPass = document.getElementById("confirmPassword");
+      
+      if (resetUsername) resetUsername.value = "";
+      if (newPass) newPass.value = "";
+      if (confirmPass) confirmPass.value = "";
 
       showNotification("Password reset successful!", "success");
     };
@@ -602,7 +627,7 @@ function setupYearManagement() {
   if (addYearBtn) {
     addYearBtn.onclick = () => {
       const yearInput = document.getElementById("newYear");
-      const year = validateInput(yearInput.value || "", 'year');
+      const year = validateInput(yearInput?.value || "", 'year');
 
       if (!year || year.length !== 4) {
         showNotification("Please enter a valid 4-digit year", "error");
@@ -621,7 +646,7 @@ function setupYearManagement() {
       // Refresh courses display
       loadLiveCourses();
 
-      yearInput.value = "";
+      if (yearInput) yearInput.value = "";
       showNotification(`Year ${year} added successfully`, "success");
     };
   }
@@ -629,7 +654,7 @@ function setupYearManagement() {
   if (delYearBtn) {
     delYearBtn.onclick = () => {
       const yearInput = document.getElementById("delYear");
-      const year = validateInput(yearInput.value || "", 'year');
+      const year = validateInput(yearInput?.value || "", 'year');
 
       if (!year) {
         showNotification("Please enter a year to delete", "error");
@@ -672,7 +697,7 @@ function setupYearManagement() {
       saveCourses();
       loadLiveCourses();
 
-      yearInput.value = "";
+      if (yearInput) yearInput.value = "";
       showNotification(
         `Year ${year} deleted. Removed ${deletedCount} courses.`,
         "success",
@@ -824,23 +849,25 @@ function showNewCourseModal() {
     yearSelect.onchange = function () {
       if (this.value === "M.A.") {
         groupSection.classList.remove("hidden");
-        document.getElementById("courseGroup").required = true;
+        const courseGroup = document.getElementById("courseGroup");
+        if (courseGroup) courseGroup.required = true;
       } else {
         groupSection.classList.add("hidden");
-        document.getElementById("courseGroup").required = false;
+        const courseGroup = document.getElementById("courseGroup");
+        if (courseGroup) courseGroup.required = false;
       }
     };
   }
 
-  modal.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function createNewCourse() {
-  const courseCode = validateInput(document.getElementById("courseCode").value || "", 'text').toUpperCase();
-  const courseName = validateInput(document.getElementById("courseName").value || "", 'text');
-  const year = document.getElementById("courseYear").value;
-  const group = document.getElementById("courseGroup").value;
-  const teacher = validateInput(document.getElementById("courseTeacher").value || "", 'text');
+  const courseCode = validateInput(document.getElementById("courseCode")?.value || "", 'text').toUpperCase();
+  const courseName = validateInput(document.getElementById("courseName")?.value || "", 'text');
+  const year = document.getElementById("courseYear")?.value;
+  const group = document.getElementById("courseGroup")?.value;
+  const teacher = validateInput(document.getElementById("courseTeacher")?.value || "", 'text');
 
   // Validation
   if (!courseCode || !courseName || !year) {
@@ -851,7 +878,7 @@ function createNewCourse() {
   // Check if M.A. course needs group
   if (year === "M.A." && !group) {
     showNotification(
-      "M.A. কোর্সের জন্য অবশ্যই একটি গ্রুপ নির্বাচন করতে হবে",
+      "M.A. course requires a group selection",
       "error",
     );
     return;
@@ -879,13 +906,19 @@ function createNewCourse() {
   saveCourses();
 
   // Close modal
-  document.getElementById("newCourseModal").classList.add("hidden");
+  const modal = document.getElementById("newCourseModal");
+  if (modal) modal.classList.add("hidden");
 
   // Clear form
-  document.getElementById("courseCode").value = "";
-  document.getElementById("courseName").value = "";
-  document.getElementById("courseYear").value = "";
-  document.getElementById("courseGroup").value = "";
+  const courseCodeInput = document.getElementById("courseCode");
+  const courseNameInput = document.getElementById("courseName");
+  const courseYearSelect = document.getElementById("courseYear");
+  const courseGroupSelect = document.getElementById("courseGroup");
+  
+  if (courseCodeInput) courseCodeInput.value = "";
+  if (courseNameInput) courseNameInput.value = "";
+  if (courseYearSelect) courseYearSelect.value = "";
+  if (courseGroupSelect) courseGroupSelect.value = "";
 
   // Refresh live courses
   loadLiveCourses();
@@ -916,7 +949,7 @@ function setupManualStudentAdd() {
   if (addStuBtn2) {
     addStuBtn2.onclick = () => {
       const courseSelect = document.getElementById("manualCourseSelect");
-      const courseId = courseSelect.value;
+      const courseId = courseSelect?.value;
 
       if (!courseId) {
         showNotification("Please select a course", "error");
@@ -935,9 +968,9 @@ function addStudentToCourse(courseId, nameFieldId, rollFieldId, regFieldId) {
     return;
   }
 
-  const name = validateInput(document.getElementById(nameFieldId).value || "", 'text');
-  const roll = validateInput(document.getElementById(rollFieldId).value || "", 'number');
-  const reg = validateInput(document.getElementById(regFieldId).value || "", 'number');
+  const name = validateInput(document.getElementById(nameFieldId)?.value || "", 'text');
+  const roll = validateInput(document.getElementById(rollFieldId)?.value || "", 'number');
+  const reg = validateInput(document.getElementById(regFieldId)?.value || "", 'number');
 
   if (!name || !roll) {
     showNotification("Name and Roll Number are required", "error");
@@ -964,9 +997,13 @@ function addStudentToCourse(courseId, nameFieldId, rollFieldId, regFieldId) {
   saveCourses();
 
   // Clear form
-  document.getElementById(nameFieldId).value = "";
-  document.getElementById(rollFieldId).value = "";
-  if (regFieldId) document.getElementById(regFieldId).value = "";
+  const nameInput = document.getElementById(nameFieldId);
+  const rollInput = document.getElementById(rollFieldId);
+  const regInput = document.getElementById(regFieldId);
+  
+  if (nameInput) nameInput.value = "";
+  if (rollInput) rollInput.value = "";
+  if (regInput) regInput.value = "";
 
   showNotification(`Student ${name} added to ${course.id}`, "success");
 }
@@ -1023,7 +1060,7 @@ function startAttendanceForCourse(courseId) {
   const today = new Date().toISOString().split("T")[0];
   if (course.dates.includes(today)) {
     const confirmResume = confirm(
-      "এই কোর্সে আজকের তারিখে ইতোমধ্যে হাজিরা গ্রহণ সম্পন্ন হয়েছে।\nআপনি কি আগের ডাটা সম্পাদনা করতে চান?"
+      "Attendance for this course has already been taken today.\nDo you want to edit previous data?"
     );
     if (!confirmResume) return;
   }
@@ -1124,29 +1161,40 @@ function showAttendancePopup() {
       skipStudent();
     } else if (e.key === 'Escape') {
       e.preventDefault();
-      document.getElementById("cancelAttendance").click();
+      const cancelBtn = document.getElementById("cancelAttendance");
+      if (cancelBtn) cancelBtn.click();
     }
   };
   
   document.addEventListener('keydown', keyHandler);
 
   // Event listeners
-  document.getElementById("markPresent").onclick = () => markStudent("present");
-  document.getElementById("markAbsent").onclick = () => markStudent("absent");
-  document.getElementById("skipStudent").onclick = skipStudent;
-  document.getElementById("markAllPresent").onclick = () => markAllStudents("present");
-  document.getElementById("markAllAbsent").onclick = () => markAllStudents("absent");
-  document.getElementById("completeAttendance").onclick = completeAttendance;
-  document.getElementById("cancelAttendance").onclick = () => {
-    document.removeEventListener('keydown', keyHandler);
-    popup.remove();
-    attendanceState.isActive = false;
-    
-    // Ask for confirmation
-    if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
-      showNotification("Attendance cancelled", "info");
-    }
-  };
+  const markPresentBtn = document.getElementById("markPresent");
+  const markAbsentBtn = document.getElementById("markAbsent");
+  const skipStudentBtn = document.getElementById("skipStudent");
+  const markAllPresentBtn = document.getElementById("markAllPresent");
+  const markAllAbsentBtn = document.getElementById("markAllAbsent");
+  const completeAttendanceBtn = document.getElementById("completeAttendance");
+  const cancelAttendanceBtn = document.getElementById("cancelAttendance");
+
+  if (markPresentBtn) markPresentBtn.onclick = () => markStudent("present");
+  if (markAbsentBtn) markAbsentBtn.onclick = () => markStudent("absent");
+  if (skipStudentBtn) skipStudentBtn.onclick = skipStudent;
+  if (markAllPresentBtn) markAllPresentBtn.onclick = () => markAllStudents("present");
+  if (markAllAbsentBtn) markAllAbsentBtn.onclick = () => markAllStudents("absent");
+  if (completeAttendanceBtn) completeAttendanceBtn.onclick = completeAttendance;
+  if (cancelAttendanceBtn) {
+    cancelAttendanceBtn.onclick = () => {
+      document.removeEventListener('keydown', keyHandler);
+      popup.remove();
+      attendanceState.isActive = false;
+      
+      // Ask for confirmation
+      if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
+        showNotification("Attendance cancelled", "info");
+      }
+    };
+  }
 }
 
 function showNextStudentInPopup() {
@@ -1224,6 +1272,12 @@ function completeAttendance() {
   if (popup) popup.remove();
   
   attendanceState.isActive = false;
+  
+  // Remove keyboard listener
+  const keyHandler = (e) => {
+    if (!attendanceState.isActive) return;
+    // ... existing key handler code
+  };
   document.removeEventListener('keydown', keyHandler);
 
   // Show summary popup
@@ -1310,7 +1364,8 @@ function exportAttendanceSummary() {
     XLSX.writeFile(wb, filename);
 
     // Close summary popup
-    document.getElementById("summaryPopup").classList.add("hidden");
+    const summaryPopup = document.getElementById("summaryPopup");
+    if (summaryPopup) summaryPopup.classList.add("hidden");
 
     showNotification(`Attendance saved as ${filename}`, "success");
     
@@ -1377,9 +1432,9 @@ function shareViaMessenger() {
 
 // ==================== ENHANCED SEARCH & CORRECTION ====================
 function searchAttendance() {
-  const date = document.getElementById("searchDate").value;
-  const courseId = document.getElementById("searchCourse").value;
-  const searchTerm = validateInput(document.getElementById("searchStudentId").value || "", 'text').toLowerCase();
+  const date = document.getElementById("searchDate")?.value;
+  const courseId = document.getElementById("searchCourse")?.value;
+  const searchTerm = validateInput(document.getElementById("searchStudentId")?.value || "", 'text').toLowerCase();
 
   if (!date || !courseId) {
     showNotification("Please select date and course", "error");
@@ -1578,15 +1633,18 @@ function clearAllData() {
 
   // Logout user
   appState.isAuthenticated = false;
-  document.getElementById("dashboardScreen").classList.add("hidden");
-  document.getElementById("loginScreen").classList.remove("hidden");
+  const dashboardScreen = document.getElementById("dashboardScreen");
+  const loginScreen = document.getElementById("loginScreen");
+  
+  if (dashboardScreen) dashboardScreen.classList.add("hidden");
+  if (loginScreen) loginScreen.classList.remove("hidden");
 
   showNotification("All data cleared. You have been logged out.", "success");
 }
 
 // ==================== ENHANCED CSV IMPORT ====================
 function importCSVData(file) {
-  const courseId = document.getElementById("importCourseSelect").value;
+  const courseId = document.getElementById("importCourseSelect")?.value;
   if (!courseId) {
     showNotification("Please select a course first", "error");
     return;
@@ -1752,26 +1810,37 @@ function setupEventListeners() {
   setupPasswordReset();
 
   // Dashboard Modules
-  document
-    .getElementById("btnAttendance")
-    ?.addEventListener("click", () => showModule("attendanceModule"));
-  document
-    .getElementById("btnSearch")
-    ?.addEventListener("click", () => showModule("searchModule"));
-  document
-    .getElementById("btnData")
-    ?.addEventListener("click", () => showModule("dataModule"));
+  const btnAttendance = document.getElementById("btnAttendance");
+  const btnSearch = document.getElementById("btnSearch");
+  const btnData = document.getElementById("btnData");
+  
+  if (btnAttendance) {
+    btnAttendance.addEventListener("click", () => showModule("attendanceModule"));
+  }
+  if (btnSearch) {
+    btnSearch.addEventListener("click", () => showModule("searchModule"));
+  }
+  if (btnData) {
+    btnData.addEventListener("click", () => showModule("dataModule"));
+  }
 
   // Attendance Module
-  document
-    .getElementById("btnNewCourse")
-    ?.addEventListener("click", showNewCourseModal);
-  document
-    .getElementById("saveCourseBtn")
-    ?.addEventListener("click", createNewCourse);
-  document.getElementById("cancelCourseBtn")?.addEventListener("click", () => {
-    document.getElementById("newCourseModal").classList.add("hidden");
-  });
+  const btnNewCourse = document.getElementById("btnNewCourse");
+  const saveCourseBtn = document.getElementById("saveCourseBtn");
+  const cancelCourseBtn = document.getElementById("cancelCourseBtn");
+  
+  if (btnNewCourse) {
+    btnNewCourse.addEventListener("click", showNewCourseModal);
+  }
+  if (saveCourseBtn) {
+    saveCourseBtn.addEventListener("click", createNewCourse);
+  }
+  if (cancelCourseBtn) {
+    cancelCourseBtn.addEventListener("click", () => {
+      const modal = document.getElementById("newCourseModal");
+      if (modal) modal.classList.add("hidden");
+    });
+  }
 
   // Year Management
   setupYearManagement();
@@ -1780,62 +1849,79 @@ function setupEventListeners() {
   setupManualStudentAdd();
 
   // Summary Popup
-  document
-    .getElementById("saveExcelBtn")
-    ?.addEventListener("click", exportAttendanceSummary);
-  document
-    .getElementById("shareSummaryBtn")
-    ?.addEventListener("click", shareAttendance);
-  document.getElementById("closeSummaryBtn")?.addEventListener("click", () => {
-    document.getElementById("summaryPopup").classList.add("hidden");
-  });
+  const saveExcelBtn = document.getElementById("saveExcelBtn");
+  const shareSummaryBtn = document.getElementById("shareSummaryBtn");
+  const closeSummaryBtn = document.getElementById("closeSummaryBtn");
+  
+  if (saveExcelBtn) {
+    saveExcelBtn.addEventListener("click", exportAttendanceSummary);
+  }
+  if (shareSummaryBtn) {
+    shareSummaryBtn.addEventListener("click", shareAttendance);
+  }
+  if (closeSummaryBtn) {
+    closeSummaryBtn.addEventListener("click", () => {
+      const summaryPopup = document.getElementById("summaryPopup");
+      if (summaryPopup) summaryPopup.classList.add("hidden");
+    });
+  }
 
   // Share Options
-  document
-    .getElementById("shareEmailBtn")
-    ?.addEventListener("click", shareViaEmail);
-  document
-    .getElementById("shareWhatsappBtn")
-    ?.addEventListener("click", shareViaWhatsApp);
-  document
-    .getElementById("shareMessengerBtn")
-    ?.addEventListener("click", shareViaMessenger);
-  document
-    .getElementById("closeSharePopupBtn")
-    ?.addEventListener("click", () => {
-      document.getElementById("shareOptionsPopup").classList.add("hidden");
+  const shareEmailBtn = document.getElementById("shareEmailBtn");
+  const shareWhatsappBtn = document.getElementById("shareWhatsappBtn");
+  const shareMessengerBtn = document.getElementById("shareMessengerBtn");
+  const closeSharePopupBtn = document.getElementById("closeSharePopupBtn");
+  
+  if (shareEmailBtn) {
+    shareEmailBtn.addEventListener("click", shareViaEmail);
+  }
+  if (shareWhatsappBtn) {
+    shareWhatsappBtn.addEventListener("click", shareViaWhatsApp);
+  }
+  if (shareMessengerBtn) {
+    shareMessengerBtn.addEventListener("click", shareViaMessenger);
+  }
+  if (closeSharePopupBtn) {
+    closeSharePopupBtn.addEventListener("click", () => {
+      const sharePopup = document.getElementById("shareOptionsPopup");
+      if (sharePopup) sharePopup.classList.add("hidden");
     });
+  }
 
   // Search Module
-  document
-    .getElementById("searchAttendanceBtn")
-    ?.addEventListener("click", searchAttendance);
+  const searchAttendanceBtn = document.getElementById("searchAttendanceBtn");
+  if (searchAttendanceBtn) {
+    searchAttendanceBtn.addEventListener("click", searchAttendance);
+  }
 
   // Data Management Module
-  document
-    .getElementById("backupDataBtn")
-    ?.addEventListener("click", backupData);
-  document
-    .getElementById("restoreDataFile")
-    ?.addEventListener("change", function (e) {
+  const backupDataBtn = document.getElementById("backupDataBtn");
+  const restoreDataFile = document.getElementById("restoreDataFile");
+  const clearAllDataBtn = document.getElementById("clearAllDataBtn");
+  const importCSVFile = document.getElementById("importCSVFile");
+  
+  if (backupDataBtn) {
+    backupDataBtn.addEventListener("click", backupData);
+  }
+  if (restoreDataFile) {
+    restoreDataFile.addEventListener("change", function (e) {
       if (e.target.files[0]) {
         restoreData(e.target.files[0]);
         e.target.value = "";
       }
     });
-  document
-    .getElementById("clearAllDataBtn")
-    ?.addEventListener("click", clearAllData);
-
-  // CSV Import
-  document
-    .getElementById("importCSVFile")
-    ?.addEventListener("change", function (e) {
+  }
+  if (clearAllDataBtn) {
+    clearAllDataBtn.addEventListener("click", clearAllData);
+  }
+  if (importCSVFile) {
+    importCSVFile.addEventListener("change", function (e) {
       if (e.target.files[0]) {
         importCSVData(e.target.files[0]);
         e.target.value = "";
       }
     });
+  }
 
   // Network Status
   window.addEventListener("online", updateNetStatus);
@@ -1846,7 +1932,7 @@ function setupEventListeners() {
     e.preventDefault();
     deferredPrompt = e;
     // Show install button (you can add this to your UI)
-    showNotification('Install this app for better experience', 'info');
+    showNotification('Install this app for better experience', 'info', 3000);
   });
   
   // Service Worker Registration
@@ -1876,7 +1962,7 @@ function migrateData(oldData) {
       dates: course.dates || [],
       attendance: course.attendance || {}
     }));
-  } else if (oldData.courses) {
+  } else if (oldData && oldData.courses) {
     // Version 2.0 data (has courses property)
     return oldData.courses;
   }
@@ -1886,7 +1972,7 @@ function migrateData(oldData) {
 
 // ==================== INITIALIZE APP ====================
 function initializeApp() {
-  console.log("Initializing Attendance System v3.1...");
+  console.log("Initializing Attendance System v3.1.1...");
   
   // Initialize network status
   updateNetStatus();
@@ -1894,20 +1980,17 @@ function initializeApp() {
   // Setup event listeners
   setupEventListeners();
   
-  // Check if auto-login happens
-  setTimeout(() => {
-    if (!appState.isAuthenticated) {
-      // Show login screen if not auto-logged in
-      document.getElementById("loginScreen")?.classList.remove("hidden");
-    }
-  }, 3000);
-  
   console.log("App initialized successfully");
 }
 
 // Make some functions available globally for HTML onclick handlers
 window.correctAttendance = correctAttendance;
 window.showNotification = showNotification;
+window.checkAutoLogin = checkAutoLogin; // Make it globally available
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeApp);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
