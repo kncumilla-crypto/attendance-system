@@ -277,7 +277,7 @@ function startSessionRefresh() {
 }
 
 // ==================== SCREEN MANAGEMENT ====================
-function window.showDashboard() {
+window.showDashboard = function() {
   const loginScreen = document.getElementById("loginScreen");
   const dashboardScreen = document.getElementById("dashboardScreen");
 
