@@ -1,7 +1,7 @@
 // attendance-system/app.js
 // University of Chittagong - Department of Philosophy
 // Attendance Management System
-// Version: 3.1.1 - Bug Fixed
+// Version: 3.1.2 - Final Bug Fix
 // Modified as per requirements with security improvements
 
 // ==================== APP CONFIGURATION ====================
@@ -9,7 +9,7 @@ const SECURITY_CONFIG = {
   users: [],
   sessionTimeout: 60 * 60 * 1000,
   maxBackupFiles: 5,
-  dataVersion: "3.1.1",
+  dataVersion: "3.1.2",
   appSalt: "cu_philosophy_2025_secure_salt"
 };
 
@@ -166,13 +166,14 @@ function updateNetStatus() {
 
 // ==================== QUOTE SYSTEM ====================
 const quotes = [
-  "Labor is the source of all wealth. - Karl Marx",
-  "Work gives meaning to life. - Tolstoy",
-  "Pleasure in the job puts perfection in the work. - Aristotle",
-  "Without labor nothing prospers. - Sophocles",
-  "Choose a job you love, and you will never have to work a day in your life. - Confucius",
-  "The only way to do great work is to love what you do. - Steve Jobs",
+  "Labor is the source of all wealth. – Karl Marx",
+  "Work gives meaning to life. – Tolstoy",
+  "Pleasure in the job puts perfection in the work. – Aristotle",
+  "Without labor nothing prospers. – Sophocles",
+  "Choose a job you love, and you will never have to work a day in your life. – Confucius",
+  "The only way to do great work is to love what you do. – Steve Jobs",
 ];
+
 function showQuote() {
   const q = quotes[Math.floor(Math.random() * quotes.length)];
   const quoteBox = document.getElementById("quoteBox");
@@ -1971,7 +1972,7 @@ function migrateData(oldData) {
 
 // ==================== INITIALIZE APP ====================
 function initializeApp() {
-  console.log("Initializing Attendance System v3.1.1...");
+  console.log("Initializing Attendance System v3.1.2...");
   
   // Initialize network status
   updateNetStatus();
