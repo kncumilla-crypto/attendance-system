@@ -1,13 +1,15 @@
 // attendance-system/service-worker.js
-const CACHE_NAME = 'attendance-system-v2';
+const CACHE_NAME = 'attendance-system-v3.1';
 const urlsToCache = [
-  '/attendance-system/',
-  '/attendance-system/index.html',
-  '/attendance-system/style.css',
-  '/attendance-system/app.js',
-  '/attendance-system/manifest.json',
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
+  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+  'https://unpkg.com/crypto-js@4.1.1/crypto-js.js',
+  './images/cu_logo.png'
 ];
 
 // Install event
@@ -15,7 +17,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Opened cache');
+        console.log('ServiceWorker: Opened cache');
         return cache.addAll(urlsToCache);
       })
       .then(() => self.skipWaiting())
@@ -72,7 +74,7 @@ self.addEventListener('fetch', event => {
         }).catch(() => {
           // If both cache and network fail, show offline page
           if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/attendance-system/index.html');
+            return caches.match('./index.html');
           }
         });
       })
