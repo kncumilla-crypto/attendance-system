@@ -468,17 +468,20 @@
         </div>
     </div>
 
-    <script>
+<script>
   // Welcome screen display for 3 seconds
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
-      document.getElementById('welcomeScreen').classList.add('hidden');
+      const welcomeScreen = document.getElementById('welcomeScreen');
+      if (welcomeScreen) {
+        welcomeScreen.classList.add('hidden');
+      }
+      
       // Auto-login will be handled by app.js
       // Don't call checkAutoLogin here as it's already in app.js
     }, 3000);
   });
-</script>
-            
+</script>     
 </body>
 </html>
 
